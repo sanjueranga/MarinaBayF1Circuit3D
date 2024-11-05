@@ -59,14 +59,15 @@ void drawAxes() {
 }
 
 // Function to render the track layout
+// Function to render the track layout
 void drawTrack() {
-    GLfloat trackVertices[][2] = {
-        { -0.8f, 0.2f }, { -0.6f, 0.4f }, { -0.4f, 0.6f }, // Left section
-        { -0.2f, 0.8f }, { 0.0f, 0.9f }, { 0.2f, 0.8f },    // Top curve
-        { 0.4f, 0.6f }, { 0.5f, 0.4f }, { 0.6f, 0.2f },     // Right section
-        { 0.5f, 0.0f }, { 0.3f, -0.2f }, { 0.1f, -0.4f },   // Bottom right curve
-        { -0.1f, -0.6f }, { -0.3f, -0.7f }, { -0.5f, -0.6f },// Bottom left curve
-        { -0.7f, -0.4f }, { -0.8f, -0.2f }                  // Connect back to start
+    GLfloat trackVertices[][3] = {
+        { -0.8f, 0.0f, 0.0f }, { -0.6f, 0.0f, 0.2f }, { -0.4f, 0.0f, 0.4f },
+        { -0.2f, 0.0f, 0.6f }, { 0.0f, 0.0f, 0.7f }, { 0.2f, 0.0f, 0.6f },   
+        { 0.4f, 0.0f, 0.4f }, { 0.5f, 0.0f, 0.2f }, { 0.6f, 0.0f, 0.0f },   
+        { 0.5f, 0.0f, -0.2f }, { 0.3f, 0.0f, -0.4f }, { 0.1f, 0.0f, -0.6f },   
+        { -0.1f, 0.0f, -0.8f }, { -0.3f, 0.0f, -0.9f }, { -0.5f, 0.0f, -0.8f },
+        { -0.7f, 0.0f, -0.6f }, { -0.8f, 0.0f, -0.4f }                  
     };
 
     glColor3f(1.0, 1.0, 1.0);  // Track color (white)
@@ -74,7 +75,7 @@ void drawTrack() {
 
     glBegin(GL_LINE_STRIP);
     for (int i = 0; i < sizeof(trackVertices) / sizeof(trackVertices[0]); i++) {
-        glVertex2fv(trackVertices[i]);
+        glVertex3fv(trackVertices[i]);
     }
     glEnd();
 }
@@ -120,8 +121,8 @@ void keyboardSpecial(int key, int x, int y) {
 
 // Keyboard input for additional controls
 void keyboard(unsigned char key, int x, int y) {
-    if (key == 'w') sceTZ += 1; // Move camera forward
-    if (key == 's') sceTZ -= 1; // Move camera backward
+    if (key == 's') sceTZ += 1; // Move camera forward
+    if (key == 'w') sceTZ -= 1; // Move camera backward
     glutPostRedisplay();
 }
 
