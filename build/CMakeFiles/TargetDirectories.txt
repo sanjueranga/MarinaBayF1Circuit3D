@@ -1,0 +1,3 @@
+/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/build/CMakeFiles/MarinaBaySim.dir
+/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/build/CMakeFiles/edit_cache.dir
+/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/build/CMakeFiles/rebuild_cache.dir
