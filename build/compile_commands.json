@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/build",
-  "command": "/usr/bin/c++   -g -o CMakeFiles/MarinaBaySim.dir/main.cpp.o -c \"/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/main.cpp\"",
-  "file": "/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/main.cpp",
-  "output": "CMakeFiles/MarinaBaySim.dir/main.cpp.o"
-}
-]
