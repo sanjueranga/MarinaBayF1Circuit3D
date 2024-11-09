@@ -2,10 +2,10 @@
 #include <math.h>
 #include <stdio.h>
 
-GLfloat camY = 2.0;          // Camera height
-GLfloat sceRY = 0.0;        // Scene rotation around Y-axis
-GLfloat sceTX = 0.0;        // Scene translation along X-axis
-GLfloat sceTZ = 0.0;        // Scene translation along Z-axis
+GLfloat camY = 2.0;         
+GLfloat sceRY = 0.0;      
+GLfloat sceTX = 0.0;        
+GLfloat sceTZ = 0.0;        
 
 // Lighting setup
 void light0() {
@@ -28,12 +28,12 @@ void setLighting() {
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 }
 
-// Function to draw grid
+
 void drawGrid() {
     GLfloat step = 1.0f;
     GLint line;
-    glColor3f(0.5, 0.5, 0.5);  // Set grid color to a subdued grey
-    glLineWidth(1.0);           // Keep grid line thin
+    glColor3f(0.5, 0.5, 0.5);  
+    glLineWidth(1.0);           
     glBegin(GL_LINES);
     for (line = -50; line <= 50; line += step) {
         glVertex3f(line, -0.4, 50);
@@ -54,7 +54,7 @@ void drawAxes() {
 }
 
 void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat width) {
-    // Calculate the direction vector between the two points
+   
     GLfloat dx = x2 - x1;
     GLfloat dz = z2 - z1;
     GLfloat length = sqrt(dx * dx + dz * dz);
@@ -63,15 +63,14 @@ void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat wi
     dx /= length;
     dz /= length;
 
-    // Calculate the left and right offset vectors for width
     GLfloat offsetX = -dz * width / 2.0f;
     GLfloat offsetZ = dx * width / 2.0f;
 
     // Define the four corners of the quad
-    glVertex3f(x1 + offsetX, 0.0f, z1 + offsetZ); // Left point on segment 1
-    glVertex3f(x1 - offsetX, 0.0f, z1 - offsetZ); // Right point on segment 1
-    glVertex3f(x2 - offsetX, 0.0f, z2 - offsetZ); // Right point on segment 2
-    glVertex3f(x2 + offsetX, 0.0f, z2 + offsetZ); // Left point on segment 2
+    glVertex3f(x1 + offsetX, 0.0f, z1 + offsetZ); 
+    glVertex3f(x1 - offsetX, 0.0f, z1 - offsetZ); 
+    glVertex3f(x2 - offsetX, 0.0f, z2 - offsetZ); 
+    glVertex3f(x2 + offsetX, 0.0f, z2 + offsetZ); 
 }
 
 void drawTrack() {
@@ -135,20 +134,65 @@ void drawTrack() {
     glEnd();
 }
 
+
+GLfloat bayVertices[][3] = {
+    {-37.5f, 0.0f, 0.0f},
+    {-12.0f, 0.0f, 15.0f},
+    {-5.0f, 0.0f, 23.0f},
+    {-3.0f, 0.0f, 27.0f},
+    {22.0f, 0.0f, 40.0f},
+    {26.0f, 0.0f, 41.0f},
+    {31.0f, 0.0f, 40.7f},  
+    {34.0f, 0.0f, 38.7f},  
+    {37.0f, 0.0f, 35.7f},  
+    {50.5f, 0.0f, -5.0f},  
+    {56.5f, 0.0f, -14.0f}, 
+    {56.5f, 0.0f, 30.0f},  
+    {53.5f, 0.0f, 45.0f},  
+    {1.5f, 0.0f, 45.0f},  
+    {-12.0f, 0.0f, 31.5f}, 
+    {-15.0f, 0.0f, 31.5f},  
+    {-17.0f, 0.0f, 32.0f},  
+    {-20.0f, 0.0f, 35.0f}, 
+    {-20.5f, 0.0f, 39.0f},  
+    {-59.5f, 0.0f, 45.0f},
+    {-49.5f, 0.0f, 25.1f},
+    {-39.9f, 0.0f, 16.5f},
+    {-39.0f, 0.0f, 14.5f},
+    {-37.0f, 0.0f, 6.5f},
+    {-36.8f, 0.0f, 6.5f},
+    {-54.6f, 0.0f, 12.0f},
+    {-60.6f, 0.0f, 11.0f},
+    {-60.6f, 0.0f, 7.0f},
+    {-53.4f, 0.0f, 7.0f},
+};
+
+// Draw the bay outline
+void drawBayOutline() {
+    glColor3f(0.0, 0.5, 0.5); 
+    glLineWidth(2.0);
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
+        glVertex3f(bayVertices[i][0], bayVertices[i][1], bayVertices[i][2]);
+    }
+    glEnd();
+}
 // Display function
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
 
     // Camera setup
-    gluLookAt(sceTX, camY, 5.0 + sceTZ,   // Camera position
-              0.0, 0.0, 0.0,           // Look-at point
-              0.0, 1.0, 0.0);          // Up direction
+    gluLookAt(sceTX, camY, 5.0 + sceTZ,  
+              0.0, 0.0, 0.0,         
+              0.0, 1.0, 0.0);          
     glRotatef(sceRY, 0.0, 1.0, 0.0);
 
     drawGrid();
     drawAxes();
     setLighting();
+
+    drawBayOutline();
 
     drawTrack();
 
@@ -165,19 +209,19 @@ void reshape(GLsizei w, GLsizei h) {
     gluPerspective(60.0, aspect_ratio, 1.0, 100.0);
 }
 
-// Special keys for camera rotation and height
+
 void keyboardSpecial(int key, int x, int y) {
-    if (key == GLUT_KEY_UP) camY += 0.5; // Zoom in
-    if (key == GLUT_KEY_DOWN) camY -= 0.5; // Zoom out
-    if (key == GLUT_KEY_LEFT) sceRY -= 2.0; // Rotate left
-    if (key == GLUT_KEY_RIGHT) sceRY += 2.0; // Rotate right
+    if (key == GLUT_KEY_UP) camY += 0.5; 
+    if (key == GLUT_KEY_DOWN) camY -= 0.5; 
+    if (key == GLUT_KEY_LEFT) sceRY -= 2.0;
+    if (key == GLUT_KEY_RIGHT) sceRY += 2.0;
     glutPostRedisplay();
 }
 
-// Keyboard input for additional controls
+
 void keyboard(unsigned char key, int x, int y) {
-    if (key == 's') sceTZ += 1; // Move camera forward
-    if (key == 'w') sceTZ -= 1; // Move camera backward
+    if (key == 's') sceTZ += 1;
+    if (key == 'w') sceTZ -= 1; 
     glutPostRedisplay();
 }
 
