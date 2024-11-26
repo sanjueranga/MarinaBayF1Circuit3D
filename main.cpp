@@ -146,16 +146,16 @@ GLfloat bayVertices[][3] = {
     {34.0f, 0.0f, 28.7f},  
     {37.0f, 0.0f, 25.7f},  
     {50.5f, 0.0f, -15.0f},  
-    {56.5f, 0.0f, -24.0f}, 
+    {56.5f, 0.0f, -44.0f}, 
     {56.5f, 0.0f, 20.0f},  
-    {53.5f, 0.0f, 35.0f},  
-    {1.5f, 0.0f, 35.0f},  
+    {53.5f, 0.0f, 45.0f},  
+    {1.5f, 0.0f, 45.0f},  
     {-12.0f, 0.0f, 21.5f}, 
     {-15.0f, 0.0f, 21.5f},  
     {-17.0f, 0.0f, 22.0f},  
     {-20.0f, 0.0f, 25.0f}, 
     {-20.5f, 0.0f, 29.0f},  
-    {-59.5f, 0.0f, 35.0f},
+    {-59.5f, 0.0f, 45.0f},
     {-49.5f, 0.0f, 15.1f},
     {-39.9f, 0.0f, 6.5f},
     {-39.0f, 0.0f, 4.5f},
@@ -197,13 +197,6 @@ void fillBayOutlineWithLandDebug() {
         if (bayVertices[i][2] > maxZ) maxZ = bayVertices[i][2];
     }
 
-
-    // Find the Z range
-    for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
-        if (bayVertices[i][2] < minZ) minZ = bayVertices[i][2];
-        if (bayVertices[i][2] > maxZ) maxZ = bayVertices[i][2];
-    }
-
     GLfloat stepZ = 0.1f;  // Step size for Z
 
     glBegin(GL_QUADS);
@@ -235,26 +228,38 @@ void fillBayOutlineWithLandDebug() {
             }
         }
 
+        // Fill regions
+        GLfloat minX = -60.6f; // Leftmost boundary (adjust as needed)
+        GLfloat maxX = 56.5f;  // Rightmost boundary (adjust as needed)
 
+        GLfloat prevX = minX;
 
-        // Fill water and land alternately
-        for (int i = 0; i < count - 1; i += 2) {
-            // Water (blue)
-            glColor3f(0.0, 0.0, 1.0);
-            glVertex3f(intersections[i], 0.0f, z);
+        for (int i = 0; i < count; i += 2) {
+            // Fill land between previous X and current intersection
+            glColor3f(0.6, 0.3, 0.1);
+            glVertex3f(prevX, 0.0f, z);
+            glVertex3f(prevX, 0.0f, z + stepZ);
             glVertex3f(intersections[i], 0.0f, z + stepZ);
-            glVertex3f(intersections[i + 1], 0.0f, z + stepZ);
-            glVertex3f(intersections[i + 1], 0.0f, z);
+            glVertex3f(intersections[i], 0.0f, z);
 
-            // Land (brown)
-            if (i + 2 < count) {  // Check bounds
-                glColor3f(0.6, 0.3, 0.1);
-                glVertex3f(intersections[i + 1], 0.0f, z);
+            // Fill water between pairs of intersections
+            if (i + 1 < count) {
+                glColor3f(0.0, 0.0, 1.0);
+                glVertex3f(intersections[i], 0.0f, z);
+                glVertex3f(intersections[i], 0.0f, z + stepZ);
                 glVertex3f(intersections[i + 1], 0.0f, z + stepZ);
-                glVertex3f(intersections[i + 2], 0.0f, z + stepZ);
-                glVertex3f(intersections[i + 2], 0.0f, z);
+                glVertex3f(intersections[i + 1], 0.0f, z);
+
+                prevX = intersections[i + 1];
             }
         }
+
+        // Fill remaining land to the right of the last intersection
+        glColor3f(0.6, 0.3, 0.1);
+        glVertex3f(prevX, 0.0f, z);
+        glVertex3f(prevX, 0.0f, z + stepZ);
+        glVertex3f(maxX, 0.0f, z + stepZ);
+        glVertex3f(maxX, 0.0f, z);
     }
 
     glEnd();
@@ -281,7 +286,7 @@ void display(void) {
     glDisable(GL_DEPTH_TEST); // Disable depth test while drawing the track
     drawTrack();
 
-    glEnable(GL_DEPTH_TEST);  // Re-enable depth test for the land/water rendering
+    glEnable(GL_DEPTH_TEST);  
 
 
 
