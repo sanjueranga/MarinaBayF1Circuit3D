@@ -7,6 +7,12 @@ GLfloat sceRY = 0.0;
 GLfloat sceTX = 0.0;        
 GLfloat sceTZ = 0.0;        
 
+
+GLfloat camX = 0.0, camY = 2.0, camZ = 5.0; // Camera position
+GLfloat camAngleX = 0.0, camAngleY = 0.0;  // Camera rotation angles
+
+GLfloat moveSpeed = 0.5f;  // Speed of camera movement
+GLfloat rotateSpeed = 5.0f; // Speed of camera rotation
 // Lighting setup
 void light0() {
     GLfloat amb[] = { 0.2, 0.2, 0.2, 1.0 };
@@ -266,48 +272,77 @@ void fillBayOutlineWithLand() {
 }
 
 
-void drawSingaporeFlyer() {
-    const int numSegments = 36; // Number of segments for the wheel
-    const float radius = 5.0f;  // Radius of the wheel
-    const float capsuleWidth = 0.4f;
-    const float capsuleHeight = 0.4f;
-    const float centerX = 22.0f, centerY = 5.0f, centerZ = 20.0f; // Flyer position
-
-    // Draw the wheel (circle)
-    glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
-    glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < numSegments; i++) {
-        float angle = 2.0f * M_PI * i / numSegments;
-        float x = centerX + radius * cos(angle);
-        float y = centerY + radius * sin(angle);
-        glVertex3f(x, y, centerZ);
-    }
-    glEnd();
-
-    // Draw the spokes
-    glBegin(GL_LINES);
-    for (int i = 0; i < numSegments; i++) {
-        float angle = 2.0f * M_PI * i / numSegments;
-        float x = centerX + radius * cos(angle);
-        float y = centerY + radius * sin(angle);
-        glVertex3f(centerX, centerY, centerZ);
-        glVertex3f(x, y, centerZ);            
-    }
-    glEnd();
-
-   
-    // for (int i = 0; i < numSegments; i++) {
-    //     float angle = 2.0f * M_PI * i / numSegments;
-    //     float x = centerX + radius * cos(angle);
-    //     float y = centerY + radius * sin(angle);
-
-    //     glPushMatrix();
-    //     glTranslatef(x, y, centerZ);
-    //     glColor3f(0.5, 0.5, 1.0); 
-    //     glutSolidCube(capsuleWidth); 
-    //     glPopMatrix();
-    // }
+void drawCylinder(float radius, float height, float r, float g, float b) {
+    GLUquadric* quad = gluNewQuadric();
+    glColor3f(r, g, b);
+    gluCylinder(quad, radius, radius, height, 16, 16);  // Draw cylinder
+    gluDeleteQuadric(quad);
 }
+
+// void drawSingaporeFlyer() {
+//     const int numSegments = 36;  // Number of segments for the wheel
+//     const float radius = 5.0f;   // Radius of the wheel
+//     const float capsuleRadius = 0.2f;
+//     const float capsuleHeight = 0.5f; // Height of the capsules (cylinders)
+//     const float centerX = 22.0f, centerY = 5.0f, centerZ = 20.0f; // Flyer position
+//     const float forkArmHeight = 10.0f; // Height of the fork arms
+//     const float forkArmSpacing = 2.0f; // Horizontal distance between fork arms
+//     const float axisRadius = 0.1f; // Radius of the center axis
+
+//     // Draw the wheel (circle)
+//     glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
+//     glBegin(GL_LINE_LOOP);
+//     for (int i = 0; i < numSegments; i++) {
+//         float angle = 2.0f * M_PI * i / numSegments;
+//         float x = centerX + radius * cos(angle);
+//         float y = centerY + radius * sin(angle);
+//         glVertex3f(x, y, centerZ);
+//     }
+//     glEnd();
+
+//     // Draw the spokes
+//     glBegin(GL_LINES);
+//     for (int i = 0; i < numSegments; i++) {
+//         float angle = 2.0f * M_PI * i / numSegments;
+//         float x = centerX + radius * cos(angle);
+//         float y = centerY + radius * sin(angle);
+//         glVertex3f(centerX, centerY, centerZ);
+//         glVertex3f(x, y, centerZ);            
+//     }
+//     glEnd();
+
+//     // Draw the capsules on the wheel
+//     for (int i = 0; i < numSegments; i++) {
+//         float angle = 2.0f * M_PI * i / numSegments;
+//         float x = centerX + radius * cos(angle);
+//         float y = centerY + radius * sin(angle);
+
+//         // Position each capsule
+//         glPushMatrix();
+//         glTranslatef(x, y, centerZ);
+//         glRotatef(angle * 180.0f / M_PI, 0.0f, 0.0f, 1.0f); // Rotate capsules correctly
+//         drawCylinder(capsuleRadius, capsuleHeight, 0.0f, 0.0f, 1.0f); // Blue capsule
+//         glPopMatrix();
+//     }
+
+//     // Draw the fork arms
+//     glPushMatrix();
+//     glTranslatef(centerX - forkArmSpacing / 2.0f, centerY - radius, centerZ);
+//     drawCylinder(axisRadius, forkArmHeight, 0.6f, 0.6f, 0.6f); // Left fork arm
+//     glPopMatrix();
+
+//     glPushMatrix();
+//     glTranslatef(centerX + forkArmSpacing / 2.0f, centerY - radius, centerZ);
+//     drawCylinder(axisRadius, forkArmHeight, 0.6f, 0.6f, 0.6f); // Right fork arm
+//     glPopMatrix();
+
+//     // Draw the middle axis (horizontal cylinder)
+//     glPushMatrix();
+//     glTranslatef(centerX, centerY, centerZ);
+//     glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // Rotate to make it horizontal
+//     drawCylinder(axisRadius, forkArmSpacing * 2.0f, 0.5, 0.5, 0.5); // Middle axis
+//     glPopMatrix();
+// }
 
 // Display function
 void display(void) {
@@ -333,7 +368,7 @@ void display(void) {
     glEnable(GL_DEPTH_TEST);  
 
 
-    drawSingaporeFlyer();
+    // drawSingaporeFlyer();
 
     glPopMatrix();
     glutSwapBuffers();
