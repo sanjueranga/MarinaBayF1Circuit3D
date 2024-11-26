@@ -167,9 +167,17 @@ GLfloat bayVertices[][3] = {
     {-53.4f, 0.0f, -3.0f},
 };
 
-// Draw the bay outline
 void drawBayOutline() {
-    glColor3f(0.0, 0.5, 0.5); 
+
+    // Loop through the vertices and connect them
+    for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
+        glVertex3f(bayVertices[i][0], bayVertices[i][1], bayVertices[i][2]);
+    }
+    glVertex3f(bayVertices[0][0], bayVertices[0][1], bayVertices[0][2]); // Close the fan
+    glEnd();
+
+    // Draw the outline on top
+    glColor3f(0.0, 0.5, 0.5); // Outline color
     glLineWidth(2.0);
     glBegin(GL_LINE_LOOP);
     for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
@@ -177,6 +185,81 @@ void drawBayOutline() {
     }
     glEnd();
 }
+
+void fillBayOutlineWithLandDebug() {
+    GLfloat minZ = 1e9, maxZ = -1e9;
+
+    GLfloat extraSpace = 1.0f; // Extend upper boundary
+
+    // Calculate minZ and maxZ
+    for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
+        if (bayVertices[i][2] < minZ) minZ = bayVertices[i][2];
+        if (bayVertices[i][2] > maxZ) maxZ = bayVertices[i][2];
+    }
+
+
+    // Find the Z range
+    for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
+        if (bayVertices[i][2] < minZ) minZ = bayVertices[i][2];
+        if (bayVertices[i][2] > maxZ) maxZ = bayVertices[i][2];
+    }
+
+    GLfloat stepZ = 0.1f;  // Step size for Z
+
+    glBegin(GL_QUADS);
+
+    for (GLfloat z = minZ; z <= maxZ + extraSpace; z += stepZ) {
+        GLfloat intersections[128];
+        int count = 0;
+
+        // Find all X intersections at current Z
+        for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
+            int j = (i + 1) % (sizeof(bayVertices) / sizeof(bayVertices[0])); // Next vertex
+            GLfloat z1 = bayVertices[i][2], z2 = bayVertices[j][2];
+            GLfloat x1 = bayVertices[i][0], x2 = bayVertices[j][0];
+
+            if ((z >= z1 && z <= z2) || (z >= z2 && z <= z1)) {
+                GLfloat x = x1 + (x2 - x1) * (z - z1) / (z2 - z1);
+                intersections[count++] = x;
+            }
+        }
+
+        // Sort intersections
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = i + 1; j < count; j++) {
+                if (intersections[i] > intersections[j]) {
+                    GLfloat temp = intersections[i];
+                    intersections[i] = intersections[j];
+                    intersections[j] = temp;
+                }
+            }
+        }
+
+
+
+        // Fill water and land alternately
+        for (int i = 0; i < count - 1; i += 2) {
+            // Water (blue)
+            glColor3f(0.0, 0.0, 1.0);
+            glVertex3f(intersections[i], 0.0f, z);
+            glVertex3f(intersections[i], 0.0f, z + stepZ);
+            glVertex3f(intersections[i + 1], 0.0f, z + stepZ);
+            glVertex3f(intersections[i + 1], 0.0f, z);
+
+            // Land (brown)
+            if (i + 2 < count) {  // Check bounds
+                glColor3f(0.6, 0.3, 0.1);
+                glVertex3f(intersections[i + 1], 0.0f, z);
+                glVertex3f(intersections[i + 1], 0.0f, z + stepZ);
+                glVertex3f(intersections[i + 2], 0.0f, z + stepZ);
+                glVertex3f(intersections[i + 2], 0.0f, z);
+            }
+        }
+    }
+
+    glEnd();
+}
+
 // Display function
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -193,8 +276,14 @@ void display(void) {
     setLighting();
 
     drawBayOutline();
+    fillBayOutlineWithLandDebug();
 
+    glDisable(GL_DEPTH_TEST); // Disable depth test while drawing the track
     drawTrack();
+
+    glEnable(GL_DEPTH_TEST);  // Re-enable depth test for the land/water rendering
+
+
 
     glPopMatrix();
     glutSwapBuffers();
