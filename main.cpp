@@ -186,7 +186,7 @@ void drawBayOutline() {
     glEnd();
 }
 
-void fillBayOutlineWithLandDebug() {
+void fillBayOutlineWithLand() {
     GLfloat minZ = 1e9, maxZ = -1e9;
 
     GLfloat extraSpace = 1.0f; // Extend upper boundary
@@ -281,7 +281,7 @@ void display(void) {
     setLighting();
 
     drawBayOutline();
-    fillBayOutlineWithLandDebug();
+    fillBayOutlineWithLand();
 
     glDisable(GL_DEPTH_TEST); // Disable depth test while drawing the track
     drawTrack();
@@ -316,6 +316,14 @@ void keyboardSpecial(int key, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
     if (key == 's') sceTZ += 1;
     if (key == 'w') sceTZ -= 1; 
+
+	if (key == 'Z')
+		sceTX += 1;
+
+	if (key == 'z')
+		sceTX -= 1;
+
+
     glutPostRedisplay();
 }
 
