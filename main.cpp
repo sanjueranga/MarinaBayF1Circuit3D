@@ -265,6 +265,50 @@ void fillBayOutlineWithLand() {
     glEnd();
 }
 
+
+void drawSingaporeFlyer() {
+    const int numSegments = 36; // Number of segments for the wheel
+    const float radius = 5.0f;  // Radius of the wheel
+    const float capsuleWidth = 0.4f;
+    const float capsuleHeight = 0.4f;
+    const float centerX = 22.0f, centerY = 5.0f, centerZ = 20.0f; // Flyer position
+
+    // Draw the wheel (circle)
+    glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex3f(x, y, centerZ);
+    }
+    glEnd();
+
+    // Draw the spokes
+    glBegin(GL_LINES);
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex3f(centerX, centerY, centerZ);
+        glVertex3f(x, y, centerZ);            
+    }
+    glEnd();
+
+   
+    // for (int i = 0; i < numSegments; i++) {
+    //     float angle = 2.0f * M_PI * i / numSegments;
+    //     float x = centerX + radius * cos(angle);
+    //     float y = centerY + radius * sin(angle);
+
+    //     glPushMatrix();
+    //     glTranslatef(x, y, centerZ);
+    //     glColor3f(0.5, 0.5, 1.0); 
+    //     glutSolidCube(capsuleWidth); 
+    //     glPopMatrix();
+    // }
+}
+
 // Display function
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -289,6 +333,7 @@ void display(void) {
     glEnable(GL_DEPTH_TEST);  
 
 
+    drawSingaporeFlyer();
 
     glPopMatrix();
     glutSwapBuffers();
