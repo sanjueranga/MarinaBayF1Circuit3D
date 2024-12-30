@@ -673,6 +673,141 @@ void drawSingaporeFlyer(){
     glPopMatrix();
 }
 
+void drawCurvedTowerPair(float baseWidth, float height, float depth, float curvature) {
+    glPushMatrix();
+    
+    float spacing = baseWidth * 1.5f;
+    float segmentHeight = height / 20.0f;
+    
+    glColor3f(0.8f, 0.8f, 0.8f);
+    
+    // First tower - less curved
+    for(int i = 0; i < 20; i++) {
+        float y = i * segmentHeight;
+        // Positive curve, reduced intensity
+        float curveOffset = (curvature * 0.8f) * sin(y/height * M_PI);
+        
+        glPushMatrix();
+        glTranslatef(curveOffset, y, 0.0f);
+        
+        glBegin(GL_QUADS);
+        // Front face
+        glVertex3f(-baseWidth/2, 0.0f, depth/2);
+        glVertex3f(baseWidth/2, 0.0f, depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, depth/2);
+        
+        // Back face
+        glVertex3f(-baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, -depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, -depth/2);
+        
+        // Side faces
+        glVertex3f(-baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(-baseWidth/2, 0.0f, depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, -depth/2);
+        
+        glVertex3f(baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(baseWidth/2, 0.0f, depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, -depth/2);
+        glEnd();
+        glPopMatrix();
+    }
+    
+    // Second tower - more curved, opposite direction
+    glPushMatrix();
+    glTranslatef(spacing + baseWidth, 0.0f, 0.0f);
+    // Add a slight rotation around Z axis (try adjusting the -5.0f angle as needed)
+    glRotatef(6.0f, 0.0f, 0.0f, 0.5f);
+
+    for(int i = 0; i < 20; i++) {
+        float y = i * segmentHeight;
+        float curveOffset = -(curvature * 3.0f) * sin(y/height * M_PI);
+        
+        glPushMatrix();
+        glTranslatef(curveOffset, y, 0.0f);
+            
+        glBegin(GL_QUADS);
+        // Same faces as first tower
+        glVertex3f(-baseWidth/2, 0.0f, depth/2);
+        glVertex3f(baseWidth/2, 0.0f, depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, depth/2);
+        
+        glVertex3f(-baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, -depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, -depth/2);
+        
+        glVertex3f(-baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(-baseWidth/2, 0.0f, depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, depth/2);
+        glVertex3f(-baseWidth/2, segmentHeight, -depth/2);
+        
+        glVertex3f(baseWidth/2, 0.0f, -depth/2);
+        glVertex3f(baseWidth/2, 0.0f, depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, depth/2);
+        glVertex3f(baseWidth/2, segmentHeight, -depth/2);
+        glEnd();
+        glPopMatrix();
+    }
+    glPopMatrix();
+    
+    // Connecting elements
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glBegin(GL_QUADS);
+    for(int i = 0; i < 20; i += 4) {
+        float y = i * segmentHeight;
+        float leftCurve = (curvature * 0.7f) * sin(y/height * M_PI);
+        float rightCurve = -curvature * sin(y/height * M_PI);
+        
+        glVertex3f(leftCurve + baseWidth/2, y, 0.0f);
+        glVertex3f(rightCurve + spacing + baseWidth/2, y, 0.0f);
+        glVertex3f(rightCurve + spacing + baseWidth/2, y + segmentHeight, 0.0f);
+        glVertex3f(leftCurve + baseWidth/2, y + segmentHeight, 0.0f);
+    }
+    glEnd();
+    
+    glPopMatrix();
+}
+void drawMarinaBaySands() {
+    glPushMatrix();
+    
+    // Reduced scale parameters
+    float towerWidth = 1.5f;    // Reduced from 3.0
+    float towerHeight = 15.0f;  // Reduced from 20.0
+    float towerDepth = 5.0f;    // Reduced from 2.0
+    float curvature = 0.4f;     // Slightly reduced curve
+    float pairSpacing = 100.0f;   // Reduced from 8.0
+    
+    // Rotate entire structure 90 degrees around Y axis
+    glRotatef(90, 0.0f, 0.0f, 0.0f);
+    
+
+    
+
+
+    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
+
+    // Draw left tower pair
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -6.0f);
+    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
+    glPopMatrix();
+
+    // Draw right tower pair
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 6.0f);
+    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
+    glPopMatrix();
+
+    
+    glPopMatrix();
+}
+
 // Display function
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -698,6 +833,8 @@ void display(void) {
    
     glEnable(GL_DEPTH_TEST);
 
+
+    drawMarinaBaySands();
 
 
     glPopMatrix();
