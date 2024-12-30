@@ -773,40 +773,104 @@ void drawCurvedTowerPair(float baseWidth, float height, float depth, float curva
     
     glPopMatrix();
 }
-void drawMarinaBaySands() {
+void drawTopPlatform() {
     glPushMatrix();
     
-    // Reduced scale parameters
-    float towerWidth = 1.5f;    // Reduced from 3.0
-    float towerHeight = 15.0f;  // Reduced from 20.0
-    float towerDepth = 5.0f;    // Reduced from 2.0
-    float curvature = 0.4f;     // Slightly reduced curve
-    float pairSpacing = 100.0f;   // Reduced from 8.0
+    float length = 10.0f;      // Reduced from 20.0f
+    float width = 2.5f;        // Reduced from 5.0f
+    float height = 0.5f;       // Reduced from 1.0f
+    int segments = 100;        // Keep same smoothness
+    float curveDepth = 0.5f;   // Reduced from 1.0f
     
-    // Rotate entire structure 90 degrees around Y axis
-    glRotatef(90, 0.0f, 0.0f, 0.0f);
+    // Main platform
+    glColor3f(0.8f, 0.8f, 0.8f);
+    glBegin(GL_QUAD_STRIP);
+    for(int i = 0; i <= segments; i++) {
+        float t = (float)i / segments;
+        float x = -length/2 + length * t;
+        float z = curveDepth * sin(t * M_PI);
+        
+        glVertex3f(x, height, z + width/2);
+        glVertex3f(x, height, z - width/2);
+        glVertex3f(x, 0.0f, z + width/2);
+        glVertex3f(x, 0.0f, z - width/2);
+    }
+    glEnd();
     
-
+    // End cap (semicircle)
+    int capSegments = 20;
+    float endX = length/2;
+    float endZ = curveDepth * sin(M_PI);
     
-
-
-    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
-
-    // Draw left tower pair
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, -6.0f);
-    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
-    glPopMatrix();
-
-    // Draw right tower pair
-    glPushMatrix();
-    glTranslatef(0.0f, 0.0f, 6.0f);
-    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
-    glPopMatrix();
-
+    // Top cap
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(endX, height, endZ);
+    for(int i = 0; i <= capSegments; i++) {
+        float angle = -M_PI/2 + (M_PI * i / capSegments);
+        float capX = endX + (width/2) * cos(angle);
+        float capZ = endZ + (width/2) * sin(angle);
+        glVertex3f(capX, height, capZ);
+    }
+    glEnd();
+    
+    // Bottom cap
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(endX, 0.0f, endZ);
+    for(int i = 0; i <= capSegments; i++) {
+        float angle = -M_PI/2 + (M_PI * i / capSegments);
+        float capX = endX + (width/2) * cos(angle);
+        float capZ = endZ + (width/2) * sin(angle);
+        glVertex3f(capX, 0.0f, capZ);
+    }
+    glEnd();
     
     glPopMatrix();
 }
+
+
+void drawMarinaBaySands() {
+    glPushMatrix();
+    // Adjust initial position for smaller scale
+    glTranslatef(-14.0f, 0.0f, 28.0f);  // Reduced from (-10.0f, 0.0f, 28.0f)
+    
+    // Scaled down parameters
+    float towerWidth = 0.75f;   // Reduced from 1.5f
+    float towerHeight = 7.5f;   // Reduced from 15.0f
+    float towerDepth = 2.5f;    // Reduced from 5.0f
+    float curvature = 0.2f;     // Reduced from 0.4f
+    
+    // Rotate entire structure
+    glRotatef(90, 0.0f, 0.0f, 0.0f);
+    
+    // Center pair
+    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
+
+    // Left tower pair - reduce spacing
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, -3.5f);  // Reduced from -7.0f
+    glRotatef(-8.0f, 0.0f, 1.0f, 0.0f);
+    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
+    glPopMatrix();
+
+    // Right tower pair
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 3.5f);   // Reduced from 7.0f
+    glRotatef(8.0f, 0.0f, 1.0f, 0.0f);
+    drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
+    glPopMatrix();
+
+    // Top platform - adjust position for new scale
+    glPushMatrix();
+    glTranslatef(1.0f, 7.5f, 0.0f);   // Reduced from (2.0f, 15.0f, 0.0f)
+    glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
+    drawTopPlatform();
+    glPopMatrix();
+        
+    glPopMatrix();
+}
+
+
+
 
 // Display function
 void display(void) {
@@ -826,7 +890,7 @@ void display(void) {
     drawBayOutline();
     fillBayOutlineWithLand();
 
-    glDisable(GL_DEPTH_TEST); // Disable depth test while drawing the track
+    glDisable(GL_DEPTH_TEST); 
     drawTrack();
     drawSingaporeFlyer();
 
