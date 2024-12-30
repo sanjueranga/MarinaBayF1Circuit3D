@@ -15,6 +15,16 @@ GLfloat camAngleX = 0.0, camAngleY = 0.0;
 
 GLfloat moveSpeed = 0.5f;
 GLfloat rotateSpeed = 5.0f;
+
+float rotationAngle = 0.0f; // Global variable for rotation
+
+void update() {
+    rotationAngle += 0.25f; // Adjust speed by changing this value
+    if (rotationAngle > 360.0f) {
+        rotationAngle -= 360.0f;
+    }
+    glutPostRedisplay();
+}
 // Lighting setup
 void light0() {
     GLfloat amb[] = { 0.2, 0.2, 0.2, 1.0 };
@@ -296,6 +306,12 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
     const float axisRadius = 0.2f;
 
 
+    glPushMatrix();
+
+
+    glTranslatef(0.0f, 7.0f, 0.0f); // Move to center point
+    glRotatef(rotationAngle, 0.0f, 0.0f, 1.0f); // Rotate around Z axis
+    glTranslatef(0.0f, -7.0f, 0.0f);
      
     glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
     glBegin(GL_LINE_LOOP);
@@ -353,6 +369,9 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
         glPopMatrix();
     }
 
+    glPopMatrix(); 
+
+
     glPushMatrix();
     glTranslatef(centerX , centerY - (radius+0.8f), centerZ - forkArmSpacing / 2.0f);
     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
@@ -370,7 +389,6 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
     glRotatef(90.0, 0.0f, 0.0f, 1.0f);
     drawCylinder(axisRadius, axisHeight, 0.6f, 0.6f, 0.6f);
     glPopMatrix();
-
 
  }
 
@@ -720,6 +738,7 @@ void init(void) {
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
+    glutIdleFunc(update);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
     glutCreateWindow("Marina Bay Circuit with Camera Controls");
