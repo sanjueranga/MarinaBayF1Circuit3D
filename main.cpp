@@ -293,7 +293,7 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
 
 
 
- void drawSingaporeFlyer() {
+ void drawSingaporeFlyerWheel() {
     const int numSegments = 36;
     const float radius = 5.0f;  
     const float capsuleRadius = 0.19f;
@@ -665,6 +665,14 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
  }
 
 
+void drawSingaporeFlyer(){
+    glPushMatrix();
+    glTranslatef(25.5f, 0.0f, 18.5f);
+    drawSingaporeFlyerWheel();
+    drawStackedBase();
+    glPopMatrix();
+}
+
 // Display function
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -685,13 +693,12 @@ void display(void) {
 
     glDisable(GL_DEPTH_TEST); // Disable depth test while drawing the track
     drawTrack();
+    drawSingaporeFlyer();
 
-    drawStackedBase();
    
     glEnable(GL_DEPTH_TEST);
 
 
-    drawSingaporeFlyer();
 
     glPopMatrix();
     glutSwapBuffers();
