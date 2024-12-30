@@ -2,17 +2,19 @@
 #include <math.h>
 #include <stdio.h>
 
-GLfloat camY = 2.0;         
-GLfloat sceRY = 0.0;      
-GLfloat sceTX = 0.0;        
-GLfloat sceTZ = 0.0;        
+//GLfloat camY = 2.0;
+GLfloat sceRY = 0.0;
+GLfloat sceTX = 0.0;
+GLfloat sceTZ = 0.0;
+
+#define M_PI 3.14159265358979323846
 
 
-GLfloat camX = 0.0, camY = 2.0, camZ = 5.0; // Camera position
-GLfloat camAngleX = 0.0, camAngleY = 0.0;  // Camera rotation angles
+GLfloat camX = 0.0, camY = 2.0, camZ = 5.0;
+GLfloat camAngleX = 0.0, camAngleY = 0.0;  
 
-GLfloat moveSpeed = 0.5f;  // Speed of camera movement
-GLfloat rotateSpeed = 5.0f; // Speed of camera rotation
+GLfloat moveSpeed = 0.5f;
+GLfloat rotateSpeed = 5.0f;
 // Lighting setup
 void light0() {
     GLfloat amb[] = { 0.2, 0.2, 0.2, 1.0 };
@@ -38,8 +40,8 @@ void setLighting() {
 void drawGrid() {
     GLfloat step = 1.0f;
     GLint line;
-    glColor3f(0.5, 0.5, 0.5);  
-    glLineWidth(1.0);           
+    glColor3f(0.5, 0.5, 0.5);
+    glLineWidth(1.0);
     glBegin(GL_LINES);
     for (line = -50; line <= 50; line += step) {
         glVertex3f(line, -0.4, 50);
@@ -60,7 +62,7 @@ void drawAxes() {
 }
 
 void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat width) {
-   
+
     GLfloat dx = x2 - x1;
     GLfloat dz = z2 - z1;
     GLfloat length = sqrt(dx * dx + dz * dz);
@@ -73,10 +75,10 @@ void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat wi
     GLfloat offsetZ = dx * width / 2.0f;
 
     // Define the four corners of the quad
-    glVertex3f(x1 + offsetX, 0.0f, z1 + offsetZ); 
-    glVertex3f(x1 - offsetX, 0.0f, z1 - offsetZ); 
-    glVertex3f(x2 - offsetX, 0.0f, z2 - offsetZ); 
-    glVertex3f(x2 + offsetX, 0.0f, z2 + offsetZ); 
+    glVertex3f(x1 + offsetX, 0.0f, z1 + offsetZ);
+    glVertex3f(x1 - offsetX, 0.0f, z1 - offsetZ);
+    glVertex3f(x2 - offsetX, 0.0f, z2 - offsetZ);
+    glVertex3f(x2 + offsetX, 0.0f, z2 + offsetZ);
 }
 
 void drawTrack() {
@@ -125,7 +127,7 @@ void drawTrack() {
         {-20.5f, 0.0f,-22.5f},
     };
 
-    GLfloat trackWidth = 1.0f;  // Set track width here
+    GLfloat trackWidth = 1.5f;  // Set track width here
 
     glColor3f(1.0, 1.0, 1.0);   // Track color
 
@@ -133,8 +135,8 @@ void drawTrack() {
 
     for (int i = 0; i < sizeof(trackVertices) / sizeof(trackVertices[0]) - 1; i++) {
         drawTrackSegment(trackVertices[i][0], trackVertices[i][2],
-                         trackVertices[i + 1][0], trackVertices[i + 1][2],
-                         trackWidth);
+            trackVertices[i + 1][0], trackVertices[i + 1][2],
+            trackWidth);
     }
 
     glEnd();
@@ -148,19 +150,19 @@ GLfloat bayVertices[][3] = {
     {-3.0f, 0.0f, 17.0f},
     {22.0f, 0.0f, 30.0f},
     {26.0f, 0.0f, 31.0f},
-    {31.0f, 0.0f, 30.7f},  
-    {34.0f, 0.0f, 28.7f},  
-    {37.0f, 0.0f, 25.7f},  
-    {50.5f, 0.0f, -15.0f},  
-    {56.5f, 0.0f, -44.0f}, 
-    {56.5f, 0.0f, 20.0f},  
-    {53.5f, 0.0f, 45.0f},  
-    {1.5f, 0.0f, 45.0f},  
-    {-12.0f, 0.0f, 21.5f}, 
-    {-15.0f, 0.0f, 21.5f},  
-    {-17.0f, 0.0f, 22.0f},  
-    {-20.0f, 0.0f, 25.0f}, 
-    {-20.5f, 0.0f, 29.0f},  
+    {31.0f, 0.0f, 30.7f},
+    {34.0f, 0.0f, 28.7f},
+    {37.0f, 0.0f, 25.7f},
+    {50.5f, 0.0f, -15.0f},
+    {56.5f, 0.0f, -44.0f},
+    {56.5f, 0.0f, 20.0f},
+    {53.5f, 0.0f, 45.0f},
+    {1.5f, 0.0f, 45.0f},
+    {-12.0f, 0.0f, 21.5f},
+    {-15.0f, 0.0f, 21.5f},
+    {-17.0f, 0.0f, 22.0f},
+    {-20.0f, 0.0f, 25.0f},
+    {-20.5f, 0.0f, 29.0f},
     {-59.5f, 0.0f, 45.0f},
     {-49.5f, 0.0f, 15.1f},
     {-39.9f, 0.0f, 6.5f},
@@ -175,14 +177,14 @@ GLfloat bayVertices[][3] = {
 
 void drawBayOutline() {
 
-    // Loop through the vertices and connect them
+ 
     for (int i = 0; i < sizeof(bayVertices) / sizeof(bayVertices[0]); i++) {
         glVertex3f(bayVertices[i][0], bayVertices[i][1], bayVertices[i][2]);
     }
     glVertex3f(bayVertices[0][0], bayVertices[0][1], bayVertices[0][2]); // Close the fan
     glEnd();
 
-    // Draw the outline on top
+   
     glColor3f(0.0, 0.5, 0.5); // Outline color
     glLineWidth(2.0);
     glBegin(GL_LINE_LOOP);
@@ -203,7 +205,7 @@ void fillBayOutlineWithLand() {
         if (bayVertices[i][2] > maxZ) maxZ = bayVertices[i][2];
     }
 
-    GLfloat stepZ = 0.1f;  // Step size for Z
+    GLfloat stepZ = 0.1f;  
 
     glBegin(GL_QUADS);
 
@@ -234,9 +236,9 @@ void fillBayOutlineWithLand() {
             }
         }
 
-        // Fill regions
-        GLfloat minX = -60.6f; // Leftmost boundary (adjust as needed)
-        GLfloat maxX = 56.5f;  // Rightmost boundary (adjust as needed)
+     
+        GLfloat minX = -60.6f;
+        GLfloat maxX = 56.5f;  
 
         GLfloat prevX = minX;
 
@@ -279,70 +281,371 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
     gluDeleteQuadric(quad);
 }
 
-// void drawSingaporeFlyer() {
-//     const int numSegments = 36;  // Number of segments for the wheel
-//     const float radius = 5.0f;   // Radius of the wheel
-//     const float capsuleRadius = 0.2f;
-//     const float capsuleHeight = 0.5f; // Height of the capsules (cylinders)
-//     const float centerX = 22.0f, centerY = 5.0f, centerZ = 20.0f; // Flyer position
-//     const float forkArmHeight = 10.0f; // Height of the fork arms
-//     const float forkArmSpacing = 2.0f; // Horizontal distance between fork arms
-//     const float axisRadius = 0.1f; // Radius of the center axis
 
-//     // Draw the wheel (circle)
-//     glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
-//     glBegin(GL_LINE_LOOP);
-//     for (int i = 0; i < numSegments; i++) {
-//         float angle = 2.0f * M_PI * i / numSegments;
-//         float x = centerX + radius * cos(angle);
-//         float y = centerY + radius * sin(angle);
-//         glVertex3f(x, y, centerZ);
-//     }
-//     glEnd();
 
-//     // Draw the spokes
-//     glBegin(GL_LINES);
-//     for (int i = 0; i < numSegments; i++) {
-//         float angle = 2.0f * M_PI * i / numSegments;
-//         float x = centerX + radius * cos(angle);
-//         float y = centerY + radius * sin(angle);
-//         glVertex3f(centerX, centerY, centerZ);
-//         glVertex3f(x, y, centerZ);            
-//     }
-//     glEnd();
+ void drawSingaporeFlyer() {
+    const int numSegments = 36;
+    const float radius = 5.0f;  
+    const float capsuleRadius = 0.19f;
+    const float capsuleHeight = 0.6f;
+    const float centerX = 0.0f, centerY = 7.0f, centerZ = 0.0f;
+    const float forkArmHeight = 6.0f;
+    const float forkArmSpacing = 2.0f;
+    const float forkRadius = 0.25f;
+    const float axisHeight = 2.0f;
+    const float axisRadius = 0.2f;
 
-//     // Draw the capsules on the wheel
-//     for (int i = 0; i < numSegments; i++) {
-//         float angle = 2.0f * M_PI * i / numSegments;
-//         float x = centerX + radius * cos(angle);
-//         float y = centerY + radius * sin(angle);
 
-//         // Position each capsule
-//         glPushMatrix();
-//         glTranslatef(x, y, centerZ);
-//         glRotatef(angle * 180.0f / M_PI, 0.0f, 0.0f, 1.0f); // Rotate capsules correctly
-//         drawCylinder(capsuleRadius, capsuleHeight, 0.0f, 0.0f, 1.0f); // Blue capsule
-//         glPopMatrix();
-//     }
+     
+    glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex3f(x, y, centerZ-0.15f);
+    }
+    glEnd();
 
-//     // Draw the fork arms
-//     glPushMatrix();
-//     glTranslatef(centerX - forkArmSpacing / 2.0f, centerY - radius, centerZ);
-//     drawCylinder(axisRadius, forkArmHeight, 0.6f, 0.6f, 0.6f); // Left fork arm
-//     glPopMatrix();
+    glColor3f(0.8, 0.8, 0.8); // Gray color for the wheel
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex3f(x, y, centerZ+0.15f);
+    }
+    glEnd();
 
-//     glPushMatrix();
-//     glTranslatef(centerX + forkArmSpacing / 2.0f, centerY - radius, centerZ);
-//     drawCylinder(axisRadius, forkArmHeight, 0.6f, 0.6f, 0.6f); // Right fork arm
-//     glPopMatrix();
+    glBegin(GL_LINES);
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex3f(centerX, centerY, centerZ+0.35f);
+        glVertex3f(x, y, centerZ+0.15f);
+    }
+    glEnd();
 
-//     // Draw the middle axis (horizontal cylinder)
-//     glPushMatrix();
-//     glTranslatef(centerX, centerY, centerZ);
-//     glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // Rotate to make it horizontal
-//     drawCylinder(axisRadius, forkArmSpacing * 2.0f, 0.5, 0.5, 0.5); // Middle axis
-//     glPopMatrix();
-// }
+
+    // Draw the spokes
+    glBegin(GL_LINES);
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + radius * cos(angle);
+        float y = centerY + radius * sin(angle);
+        glVertex3f(centerX, centerY, centerZ-0.35f);
+        glVertex3f(x, y, centerZ-0.15f);            
+    }
+    glEnd();
+
+ 
+    for (int i = 0; i < numSegments; i++) {
+        float angle = 2.0f * M_PI * i / numSegments;
+        float x = centerX + (radius+0.25f) * cos(angle);
+        float y = centerY + (radius + 0.25f) * sin(angle);
+
+        // Position each capsule
+        glPushMatrix();
+        glTranslatef(x, y, centerZ-0.25f);
+        glRotatef(angle * 180.0f / M_PI, 0.0f, 0.0f, 1.0f);
+        drawCylinder(capsuleRadius, capsuleHeight, 0.0f, 0.0f, 1.0f);
+        glPopMatrix();
+    }
+
+    glPushMatrix();
+    glTranslatef(centerX , centerY - (radius+0.8f), centerZ - forkArmSpacing / 2.0f);
+    glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+    drawCylinder(forkRadius, forkArmHeight, 0.6f, 0.6f, 0.6f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX , centerY - (radius + 0.8f), centerZ + forkArmSpacing / 2.0f);
+    glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+    drawCylinder(forkRadius, forkArmHeight, 0.6f, 0.6f, 0.6f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(centerX,centerY, centerZ - forkArmSpacing / 2.0f);
+    glRotatef(90.0, 0.0f, 0.0f, 1.0f);
+    drawCylinder(axisRadius, axisHeight, 0.6f, 0.6f, 0.6f);
+    glPopMatrix();
+
+
+ }
+
+
+
+
+
+ void drawArc(float cx, float cy, float r, float startAngle, float endAngle, float z) {
+     glBegin(GL_LINE_STRIP);
+     for (float theta = startAngle; theta <= endAngle; theta += 0.01f) {
+         float x = cx + r * cos(theta);
+         float y = cy + r * sin(theta);
+         glVertex3f(x, y, z);
+     }
+     glEnd();
+ }
+
+
+ void drawLine(float x1, float y1, float x2, float y2, float z) {
+     glBegin(GL_LINES);
+     glVertex3f(x1, y1, z);
+     glVertex3f(x2, y2, z);
+     glEnd();
+ }
+
+
+ void drawReuleauxBaseWithLines(float r, float height) {
+     float angleOffset = 2.0f * M_PI / 3.0f;
+
+     float prevX, prevY, firstX, firstY;
+
+     // Bottom face (z=0)
+     glColor3f(1.0f, 0.5f, 0.5f);
+     for (int i = 0; i < 3; i++) {
+         float cx = r * cos(i * angleOffset);
+         float cy = r * sin(i * angleOffset);
+         float startAngle = i * angleOffset - M_PI / 3.0f;
+         float endAngle = i * angleOffset + M_PI / 3.0f;
+
+         // Calculate arc endpoints
+         float startX = cx + r * cos(startAngle);
+         float startY = cy + r * sin(startAngle);
+         float endX = cx + r * cos(endAngle);
+         float endY = cy + r * sin(endAngle);
+
+         // Draw arc
+         drawArc(cx, cy, r, startAngle, endAngle, 0.0f); // Bottom face z=0
+
+       
+         if (i > 0) {
+             drawLine(prevX, prevY, startX, startY, 0.0f);
+         }
+         else {
+             firstX = startX;
+             firstY = startY;
+         }
+         prevX = endX;
+         prevY = endY;
+     }
+   
+     drawLine(prevX, prevY, firstX, firstY, 0.0f);
+
+     glColor3f(0.5f, 0.5f, 1.0f);
+     for (int i = 0; i < 3; i++) {
+         float cx = r * cos(i * angleOffset);
+         float cy = r * sin(i * angleOffset);
+         float startAngle = i * angleOffset - M_PI / 3.0f;
+         float endAngle = i * angleOffset + M_PI / 3.0f;
+
+         // Calculate arc endpoints
+         float startX = cx + r * cos(startAngle);
+         float startY = cy + r * sin(startAngle);
+         float endX = cx + r * cos(endAngle);
+         float endY = cy + r * sin(endAngle);
+
+         // Draw arc
+         drawArc(cx, cy, r, startAngle, endAngle, height); // Top face z=height
+
+         // Draw line connecting previous arc to current arc
+         if (i > 0) {
+             drawLine(prevX, prevY, startX, startY, height); // Connect arcs
+         }
+         else {
+             firstX = startX;
+             firstY = startY;
+         }
+         prevX = endX;
+         prevY = endY;
+     }
+   
+     drawLine(prevX, prevY, firstX, firstY, height);
+
+   
+     glColor3f(0.7f, 0.7f, 0.7f);
+     glBegin(GL_QUADS);
+     for (int i = 0; i < 3; i++) {
+         float cx = r * cos(i * angleOffset);
+         float cy = r * sin(i * angleOffset);
+         float startAngle = i * angleOffset - M_PI / 3.0f;
+         float endAngle = i * angleOffset + M_PI / 3.0f;
+
+         for (float theta = startAngle; theta < endAngle; theta += 0.1f) {
+             float x1 = cx + r * cos(theta);
+             float y1 = cy + r * sin(theta);
+             float x2 = cx + r * cos(theta + 0.1f);
+             float y2 = cy + r * sin(theta + 0.1f);
+
+             glVertex3f(x1, y1, 0.0f);      
+             glVertex3f(x2, y2, 0.0f);    
+             glVertex3f(x2, y2, height);    
+             glVertex3f(x1, y1, height);    
+         }
+     }
+     glEnd();
+ }
+
+
+ void fillTrianglesBetweenArcs(float r, float height) {
+     float angleOffset = 2.0f * M_PI / 3.0f; // 120 degrees in radians
+
+     glColor3f(0.0f, 1.0f, 0.0f); // Set color to green
+     glBegin(GL_TRIANGLES);
+
+     for (int i = 0; i < 3; i++) {
+         float cx = r * cos(i * angleOffset); // Center of current arc
+         float cy = r * sin(i * angleOffset);
+
+         float startAngle = i * angleOffset - M_PI / 3.0f;
+         float endAngle = i * angleOffset + M_PI / 3.0f;
+
+         // Arc endpoints
+         float startX = cx + r * cos(startAngle);
+         float startY = cy + r * sin(startAngle);
+         float endX = cx + r * cos(endAngle);
+         float endY = cy + r * sin(endAngle);
+
+         // Draw the triangle
+         glVertex3f(cx, cy, height);       // Center of the arc
+         glVertex3f(startX, startY, height); // Start of the arc
+         glVertex3f(endX, endY, height);   // End of the arc
+     }
+
+     glEnd();
+ }
+
+ void drawStackedBase2() {
+
+     const float centerX = 0.0f, centerY = 5.0f, centerZ = 0.0f;
+
+
+     glPushMatrix();
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(3.0f, 0.2f);
+     glPopMatrix();
+
+     glPushMatrix();
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(2.5f, 0.2f);
+     glPopMatrix();
+
+
+    // glPushMatrix();
+     //glTranslatef(centerX,1.5f , centerZ);
+     //glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     //drawReuleauxBaseWithLines(2.5f, 1.5f);
+     //glPopMatrix();
+
+
+
+     //glPushMatrix();
+    // glTranslatef(centerX,3.0f , centerZ );
+     //glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     //drawReuleauxBaseWithLines(2.0f, 1.5f);
+     //glPopMatrix();
+ }
+
+
+ // Function to draw and fill the gap between two Reuleaux bases
+ void drawFilledGapBetweenReuleaux(float r1, float r2, float height) {
+     float angleOffset = 2.0f * M_PI / 3.0f; // 120 degrees in radians
+
+     glBegin(GL_QUADS);
+     glColor3f(0.7f, 0.7f, 0.7f); // Use the color for the gap
+
+     for (int i = 0; i < 3; i++) {
+         float cx1 = r1 * cos(i * angleOffset); // Center of current arc (larger radius)
+         float cy1 = r1 * sin(i * angleOffset);
+
+         float cx2 = r2 * cos(i * angleOffset); // Center of current arc (smaller radius)
+         float cy2 = r2 * sin(i * angleOffset);
+
+         float startAngle = i * angleOffset - M_PI / 3.0f;
+         float endAngle = i * angleOffset + M_PI / 3.0f;
+
+         for (float theta = startAngle; theta < endAngle; theta += 0.1f) {
+             // Points on the larger arc
+             float x1_start = cx1 + r1 * cos(theta);
+             float y1_start = cy1 + r1 * sin(theta);
+             float x1_end = cx1 + r1 * cos(theta + 0.1f);
+             float y1_end = cy1 + r1 * sin(theta + 0.1f);
+
+             // Points on the smaller arc
+             float x2_start = cx2 + r2 * cos(theta);
+             float y2_start = cy2 + r2 * sin(theta);
+             float x2_end = cx2 + r2 * cos(theta + 0.1f);
+             float y2_end = cy2 + r2 * sin(theta + 0.1f);
+
+             // Create quads between the larger and smaller arcs
+             glVertex3f(x1_start, y1_start, 0.0f);
+             glVertex3f(x1_end, y1_end, 0.0f);
+             glVertex3f(x2_end, y2_end, 0.0f);
+             glVertex3f(x2_start, y2_start, 0.0f);
+         }
+     }
+     glEnd();
+ }
+
+ void drawStackedBase() {
+     // Parameters for the first layer
+     float outerRadius = 3.0f; // Outer radius of the first Reuleaux
+     float innerRadius = 2.5f; // Inner radius of the first Reuleaux
+     float height = 0.2f;      // Height of each Reuleaux layer
+
+     // Draw the first layer
+     glPushMatrix();
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(outerRadius, height); // Outer Reuleaux
+     glPopMatrix();
+
+     // Draw the second layer (gap-filled with the first)
+     glPushMatrix();
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(innerRadius, height); // Inner Reuleaux
+     drawFilledGapBetweenReuleaux(outerRadius, innerRadius, height); // Fill the gap
+     glPopMatrix();
+
+     // Parameters for the second stacked set
+     float secondOuterRadius = innerRadius; // Outer radius for the second set
+     float secondInnerRadius = 2.0f;        // Inner radius for the second set
+
+     // Draw the third layer (outer of the second stacked set)
+     glPushMatrix();
+     glTranslatef(0.0f, 0.5f, 0.0f); // Move up to stack on top of the first set
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(secondOuterRadius, height);
+     glPopMatrix();
+
+     // Draw the fourth layer (inner of the second stacked set)
+     glPushMatrix();
+     glTranslatef(0.0f, 0.5f, 0.0f); // Move up to stack on top of the first set
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(secondInnerRadius, height);
+     drawFilledGapBetweenReuleaux(secondOuterRadius, secondInnerRadius, height); // Fill the gap
+     glPopMatrix();
+
+     // Parameters for the third stacked set
+     float thirdOuterRadius = secondInnerRadius; // Outer radius for the third set
+     float thirdInnerRadius = 1.5f;             // Inner radius for the third set
+
+     // Draw the fifth layer (outer of the third stacked set)
+     glPushMatrix();
+     glTranslatef(0.0f, 1.0f, 0.0f); // Move up to stack on top of the second set
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(thirdOuterRadius, height);
+     glPopMatrix();
+
+     // Draw the sixth layer (inner of the third stacked set)
+     glPushMatrix();
+     glTranslatef(0.0f, 1.0f, 0.0f); // Move up to stack on top of the second set
+     glRotatef(90.0, -1.0f, 0.0f, 0.0f);
+     drawReuleauxBaseWithLines(thirdInnerRadius, height);
+     drawFilledGapBetweenReuleaux(thirdOuterRadius, thirdInnerRadius, height); // Fill the gap
+     glPopMatrix();
+ }
+
 
 // Display function
 void display(void) {
@@ -350,9 +653,9 @@ void display(void) {
     glPushMatrix();
 
     // Camera setup
-    gluLookAt(sceTX, camY, 5.0 + sceTZ,  
-              0.0, 0.0, 0.0,         
-              0.0, 1.0, 0.0);          
+    gluLookAt(sceTX, camY, 5.0 + sceTZ,
+        0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0);
     glRotatef(sceRY, 0.0, 1.0, 0.0);
 
     drawGrid();
@@ -365,10 +668,12 @@ void display(void) {
     glDisable(GL_DEPTH_TEST); // Disable depth test while drawing the track
     drawTrack();
 
-    glEnable(GL_DEPTH_TEST);  
+    drawStackedBase();
+   
+    glEnable(GL_DEPTH_TEST);
 
 
-    // drawSingaporeFlyer();
+    drawSingaporeFlyer();
 
     glPopMatrix();
     glutSwapBuffers();
@@ -385,8 +690,8 @@ void reshape(GLsizei w, GLsizei h) {
 
 
 void keyboardSpecial(int key, int x, int y) {
-    if (key == GLUT_KEY_UP) camY += 0.5; 
-    if (key == GLUT_KEY_DOWN) camY -= 0.5; 
+    if (key == GLUT_KEY_UP) camY += 0.5;
+    if (key == GLUT_KEY_DOWN) camY -= 0.5;
     if (key == GLUT_KEY_LEFT) sceRY -= 2.0;
     if (key == GLUT_KEY_RIGHT) sceRY += 2.0;
     glutPostRedisplay();
@@ -395,13 +700,13 @@ void keyboardSpecial(int key, int x, int y) {
 
 void keyboard(unsigned char key, int x, int y) {
     if (key == 's') sceTZ += 1;
-    if (key == 'w') sceTZ -= 1; 
+    if (key == 'w') sceTZ -= 1;
 
-	if (key == 'Z')
-		sceTX += 1;
+    if (key == 'Z')
+        sceTX += 1;
 
-	if (key == 'z')
-		sceTX -= 1;
+    if (key == 'z')
+        sceTX -= 1;
 
 
     glutPostRedisplay();
