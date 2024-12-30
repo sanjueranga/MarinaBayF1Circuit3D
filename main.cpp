@@ -773,9 +773,10 @@ void drawCurvedTowerPair(float baseWidth, float height, float depth, float curva
     
     glPopMatrix();
 }
+
 void drawTopPlatform() {
     glPushMatrix();
-    
+    glRotatef(180, 0.0f, 1.0f, 0.0f);
     float length = 10.0f;      // Reduced from 20.0f
     float width = 2.5f;        // Reduced from 5.0f
     float height = 0.5f;       // Reduced from 1.0f
@@ -848,20 +849,20 @@ void drawMarinaBaySands() {
     // Left tower pair - reduce spacing
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, -3.5f);  // Reduced from -7.0f
-    glRotatef(-8.0f, 0.0f, 1.0f, 0.0f);
+    glRotatef(8.0f, 0.0f, 1.0f, 0.0f);
     drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
     glPopMatrix();
 
     // Right tower pair
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, 3.5f);   // Reduced from 7.0f
-    glRotatef(8.0f, 0.0f, 1.0f, 0.0f);
+    glRotatef(-8.0f, 0.0f, 1.0f, 0.0f);
     drawCurvedTowerPair(towerWidth, towerHeight, towerDepth, curvature);
     glPopMatrix();
 
     // Top platform - adjust position for new scale
     glPushMatrix();
-    glTranslatef(1.0f, 7.5f, 0.0f);   // Reduced from (2.0f, 15.0f, 0.0f)
+    glTranslatef(0.0f, 7.5f, 0.0f);   // Reduced from (2.0f, 15.0f, 0.0f)
     glRotatef(-90.0f, 0.0f, 1.0f, 0.0f);
     drawTopPlatform();
     glPopMatrix();
