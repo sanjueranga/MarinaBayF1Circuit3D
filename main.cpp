@@ -668,6 +668,7 @@ void drawCylinder(float radius, float height, float r, float g, float b) {
 void drawSingaporeFlyer(){
     glPushMatrix();
     glTranslatef(25.5f, 0.0f, 18.5f);
+    glScalef(0.8f, 0.8f, 0.8f);  // Scale down to 80% of original size
     drawSingaporeFlyerWheel();
     drawStackedBase();
     glPopMatrix();
@@ -870,6 +871,52 @@ void drawMarinaBaySands() {
     glPopMatrix();
 }
 
+void drawCurvedSlice(float radius, float thickness, float maxHeight, float minHeight, float angleRange) {
+    const int segments = 50;
+    glColor3f(1.0f, 0.7f, 0.0f);
+    glBegin(GL_QUAD_STRIP);
+    for (int i = 0; i <= segments; i++) {
+        float angle = (angleRange * i) / segments;
+
+        // Height varies with angle - tallest in the middle
+        float height = minHeight + (maxHeight - minHeight) * 
+                           sin(angle / angleRange * M_PI);
+
+        // Coordinates for the lower-right quadrant (x > 0, y < 0)
+        float x1 = radius * cos(angle);
+        float y1 = -radius * sin(angle);  // Negate y for the lower-right quadrant
+        float x2 = (radius - thickness) * cos(angle);
+        float y2 = -(radius - thickness) * sin(angle);  // Negate y for the lower-right quadrant
+
+        glVertex3f(x1, y1, 0.0f);  // Outer bottom vertex
+        glVertex3f(x2, y2, 0.0f);  // Inner bottom vertex
+        glVertex3f(x1, y1, height);  // Outer top vertex
+        glVertex3f(x2, y2, height);  // Inner top vertex
+    }
+    glEnd();
+}
+
+void drawArtScienceMuseum() {
+    const int numPetals = 4; // Number of petals
+    const float totalAngleRange = M_PI; // 180 degrees
+    const float radius = 2.0f;
+    const float thickness = 0.5f;
+    const float maxHeight = 1.0f;
+    const float minHeight = 0.5f;
+
+    glTranslatef(0.0f, 2.0f, 0.0f); 
+
+    float angleIncrement = totalAngleRange / numPetals; // Angle increment per petal (45° for each petal)
+    float petalAngles[4] = {M_PI / 2,  M_PI / 2, 3 * M_PI / 5, 4 * M_PI / 5}; // Vary the petal angles (90, 120, 150 degrees)
+
+    for (int i = 0; i < numPetals; i++) {
+        glPushMatrix();
+        glRotatef(i * angleIncrement * 180.0f / M_PI, 0.0f, 1.0f, 0.0f); // Rotation for each petal based on the increment
+        drawCurvedSlice(radius, thickness, maxHeight, minHeight, petalAngles[i]);
+
+        glPopMatrix();
+    }
+}
 
 
 
@@ -901,6 +948,7 @@ void display(void) {
 
     drawMarinaBaySands();
 
+    drawArtScienceMuseum();
 
     glPopMatrix();
     glutSwapBuffers();
