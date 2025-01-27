@@ -318,7 +318,7 @@ void fillBayOutlineWithLand() {
 
         for (int i = 0; i < count; i += 2) {
             // Fill land between previous X and current intersection
-            glColor3f(0.6, 0.3, 0.1);
+            glColor3f(0.1, 0.1, 0.3);
             glVertex3f(prevX, 0.0f, z);
             glVertex3f(prevX, 0.0f, z + stepZ);
             glVertex3f(intersections[i], 0.0f, z + stepZ);
@@ -326,7 +326,7 @@ void fillBayOutlineWithLand() {
 
             // Fill water between pairs of intersections
             if (i + 1 < count) {
-                glColor3f(0.0, 0.0, 1.0);
+                glColor4f(0.05f, 0.05f, 0.15f, 0.8f);
                 glVertex3f(intersections[i], 0.0f, z);
                 glVertex3f(intersections[i], 0.0f, z + stepZ);
                 glVertex3f(intersections[i + 1], 0.0f, z + stepZ);
@@ -337,7 +337,7 @@ void fillBayOutlineWithLand() {
         }
 
         // Fill remaining land to the right of the last intersection
-        glColor3f(0.6, 0.3, 0.1);
+        glColor3f(0.1, 0.1, 0.3);
         glVertex3f(prevX, 0.0f, z);
         glVertex3f(prevX, 0.0f, z + stepZ);
         glVertex3f(maxX, 0.0f, z + stepZ);
