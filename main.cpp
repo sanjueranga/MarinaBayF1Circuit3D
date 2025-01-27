@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <stdio.h>
+#include <SOIL/SOIL.h>
 
 //GLfloat camY = 2.0;
 GLfloat sceRY = 0.0;
@@ -71,24 +72,87 @@ void drawAxes() {
     glEnd();
 }
 
-void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat width) {
+GLuint textureID;
+int width, height;
 
+// Update the texture loading and initialization
+GLuint loadTexture(const char* filename) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    // Load image using SOIL
+    int width, height;
+    unsigned char* image = SOIL_load_image(filename, 
+                                         &width, 
+                                         &height, 
+                                         0, 
+                                         SOIL_LOAD_RGB);
+                                         
+    if (!image) {
+        printf("Failed to load texture: %s\n", SOIL_last_result());
+        return 0;
+    }
+
+    // Generate texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, 
+                 GL_UNSIGNED_BYTE, image);
+    
+    // Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    SOIL_free_image_data(image);
+    return textureID;
+}
+
+// Update initialization
+
+
+// Update drawTrackSegment function
+void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat width) {
     GLfloat dx = x2 - x1;
     GLfloat dz = z2 - z1;
     GLfloat length = sqrt(dx * dx + dz * dz);
 
-    // Normalize the direction vector
+    // Normalize direction vector
     dx /= length;
     dz /= length;
 
+    // Calculate perpendicular offset
     GLfloat offsetX = -dz * width / 2.0f;
     GLfloat offsetZ = dx * width / 2.0f;
 
-    // Define the four corners of the quad
-    glVertex3f(x1 + offsetX, 0.0f, z1 + offsetZ);
-    glVertex3f(x1 - offsetX, 0.0f, z1 - offsetZ);
-    glVertex3f(x2 - offsetX, 0.0f, z2 - offsetZ);
-    glVertex3f(x2 + offsetX, 0.0f, z2 + offsetZ);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    
+    // Enable blending for better texture appearance
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBegin(GL_QUADS);
+    glColor3f(1.0, 1.0, 1.0);  // White color to show texture properly
+    
+    // Adjust texture coordinates to repeat along track length
+    float texScale = length / width;  // Scale texture based on segment dimensions
+    
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(x1 + offsetX, 0.01f, z1 + offsetZ);  // Slightly raised to prevent z-fighting
+    
+    glTexCoord2f(0.0f, texScale);
+    glVertex3f(x2 + offsetX, 0.01f, z2 + offsetZ);
+    
+    glTexCoord2f(1.0f, texScale);
+    glVertex3f(x2 - offsetX, 0.01f, z2 - offsetZ);
+    
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(x1 - offsetX, 0.01f, z1 - offsetZ);
+    glEnd();
+
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
 }
 
 void drawTrack() {
@@ -938,8 +1002,10 @@ void display(void) {
     drawBayOutline();
     fillBayOutlineWithLand();
 
+    glEnable(GL_TEXTURE_2D);  // Enable texturing before drawing track
     glDisable(GL_DEPTH_TEST); 
     drawTrack();
+    glDisable(GL_TEXTURE_2D);
     drawSingaporeFlyer();
 
    
@@ -991,7 +1057,24 @@ void keyboard(unsigned char key, int x, int y) {
 void init(void) {
     glClearColor(0.0, 0.0, 0.1, 1.0);
     glEnable(GL_DEPTH_TEST);
-}
+    
+    // Try multiple texture file paths
+    const char* texturePaths[] = {
+        "textures/road.jpg",
+        "../textures/road.jpg",
+        "/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/textures/road.jpg"
+    };
+    
+    bool textureLoaded = false;
+    for(const char* path : texturePaths) {
+        textureID = loadTexture(path);
+        if(textureID) {
+            textureLoaded = true;
+            break;
+        }
+    }
+}    
+
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
