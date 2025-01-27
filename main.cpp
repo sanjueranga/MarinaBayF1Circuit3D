@@ -9,6 +9,8 @@ GLfloat sceTX = 0.0;
 GLfloat sceTZ = 0.0;
 
 #define M_PI 3.14159265358979323846
+#define MAX_LIGHTS 9;
+
 
 
 GLfloat camX = 0.0, camY = 2.0, camZ = 5.0;
@@ -16,6 +18,24 @@ GLfloat camAngleX = 0.0, camAngleY = 0.0;
 
 GLfloat moveSpeed = 0.5f;
 GLfloat rotateSpeed = 5.0f;
+GLfloat globalAmbient[] = {0.2f, 0.2f, 0.3f, 1.0f};  // Night sky ambient
+
+// Structure for light towers
+struct LightTower {
+    float x, y, z;  // Position
+    float height;   // Tower height
+};
+
+// Define light tower positions around track
+LightTower lightTowers[] = {
+    {-20.5f, 0.0f, -21.5f, 5.0f},
+    {-49.5f, 0.0f, -20.5f, 5.0f},
+    {31.0f, 0.0f, 25.5f, 5.0f},
+    {30.5f, 0.0f, -10.5f, 5.0f},
+    {-5.0f, 0.0f, -10.0f, 5.0f},
+
+};
+
 
 float rotationAngle = 0.0f; // Global variable for rotation
 
@@ -983,8 +1003,48 @@ void drawArtScienceMuseum() {
 }
 
 
+// Add this function to draw light towers
+void drawLightTower(float x, float y, float z, float height) {
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glRotatef(90.0f, -1.0f, 0.0f, 0.0f);
+    
+    // Draw tower pole
+    glColor3f(0.7f, 0.7f, 0.7f);
+    GLUquadricObj *quad = gluNewQuadric();
+    gluCylinder(quad, 0.1f, 0.1f, height, 8, 1);
+    
+    // Draw light fixture
+    glTranslatef(0.0f, 0.0f, height);
+    glColor3f(1.0f, 1.0f, 0.9f);
+    glutSolidCone(0.3f, 0.5f, 8, 1);
+    
+    gluDeleteQuadric(quad);
+    glPopMatrix();
+}
 
-// Display function
+// Update lighting setup
+void setupLights() {
+    // Track spotlights
+   for(int i = 0; i < sizeof(lightTowers)/sizeof(LightTower); i++) {
+        GLenum light = GL_LIGHT0 + i;
+        glEnable(light);
+        
+        GLfloat pos[] = {lightTowers[i].x, lightTowers[i].height, lightTowers[i].z, 1.0f};
+        GLfloat dir[] = {0.0f, -1.0f, 0.0f};
+        GLfloat white[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        GLfloat ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};  // Increased ambient
+        
+        glLightfv(light, GL_POSITION, pos);
+        glLightfv(light, GL_SPOT_DIRECTION, dir);
+        glLightf(light, GL_SPOT_CUTOFF, 200.0f);        // Wider coverage
+        glLightf(light, GL_SPOT_EXPONENT, 1.5f);       // Softer edge
+        glLightfv(light, GL_DIFFUSE, white);
+        glLightfv(light, GL_AMBIENT, ambient);
+        glLightf(light, GL_QUADRATIC_ATTENUATION, 0.03f); // Less falloff
+    }
+}
+
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
@@ -995,25 +1055,26 @@ void display(void) {
         0.0, 1.0, 0.0);
     glRotatef(sceRY, 0.0, 1.0, 0.0);
 
+    setupLights();
+    
     drawGrid();
     drawAxes();
-    setLighting();
+
+    // Draw light towers
+    for(int i = 0; i < sizeof(lightTowers)/sizeof(LightTower); i++) {
+        drawLightTower(lightTowers[i].x, lightTowers[i].y, 
+                      lightTowers[i].z, lightTowers[i].height);
+    }
 
     drawBayOutline();
     fillBayOutlineWithLand();
 
-    glEnable(GL_TEXTURE_2D);  // Enable texturing before drawing track
-    glDisable(GL_DEPTH_TEST); 
+    glEnable(GL_TEXTURE_2D);
     drawTrack();
     glDisable(GL_TEXTURE_2D);
+
     drawSingaporeFlyer();
-
-   
-    glEnable(GL_DEPTH_TEST);
-
-
     drawMarinaBaySands();
-
     drawArtScienceMuseum();
 
     glPopMatrix();
@@ -1053,12 +1114,18 @@ void keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-// Initialization function
 void init(void) {
     glClearColor(0.0, 0.0, 0.1, 1.0);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
+
+    // Enable materials
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     
-    // Try multiple texture file paths
+    // Load textures
     const char* texturePaths[] = {
         "textures/road.jpg",
         "../textures/road.jpg",
@@ -1073,8 +1140,11 @@ void init(void) {
             break;
         }
     }
-}    
 
+    // Set up global ambient light
+    GLfloat globalAmbient[] = {0.2f, 0.2f, 0.3f, 1.0f};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, globalAmbient);
+}
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
