@@ -7,10 +7,35 @@
 #define MAX_LIGHTS 8;
 
 
-//GLfloat camY = 2.0;
-GLfloat sceRY = 0.0;
-GLfloat sceTX = 0.0;
-GLfloat sceTZ = 0.0;
+GLfloat camXInit = 0.0;
+GLfloat camYInit = 0.5;
+GLfloat camZInit = 0.0;
+GLfloat sceRXInit = 0.0;
+GLfloat sceRYInit = 75.0;
+GLfloat sceRZInit = 0.0;
+GLfloat sceTXInit = 0.0;
+GLfloat sceTYInit = 0.0;
+GLfloat sceTZInit = 0.0;
+
+// variables to move the scene
+GLfloat sceRX = sceRXInit;
+GLfloat sceRY = sceRYInit;
+GLfloat sceRZ = sceRZInit;
+GLfloat sceTX = sceTXInit;
+GLfloat sceTY = sceTYInit;
+GLfloat sceTZ = sceTZInit;
+
+////variables to move the objects
+GLfloat objRX = 0.0;
+GLfloat objRY = 0.0;
+GLfloat objRZ = 0.0;
+GLfloat objTX = 0.0;
+GLfloat objTY = 0.0;
+GLfloat objTZ = 0.0;
+
+GLfloat lookX = 0.0;
+GLfloat lookY = 0.0;
+GLfloat lookZ = 0.0;
 
 
 
@@ -36,6 +61,7 @@ LightTower lightTowers[] = {
     {31.0f, 0.0f, 25.5f, 5.0f},
     {30.5f, 0.0f, -10.5f, 5.0f},
     {-5.0f, 0.0f, -10.0f, 5.0f},
+
 
 };
 
@@ -1170,11 +1196,33 @@ void drawLightTower(float x, float y, float z, float height) {
     glPopMatrix();
 }
 
+
+
+void setupMarinaBaySandsLighting() {
+    // Front facade spotlights
+    GLfloat mbs_color[] = {0.9f, 0.0f, 0.2f, 1.0f};  // Warm white
+    GLfloat mbs_ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};
+    GLfloat spot_dir[] = {0.0f, 0.7f, -0.3f};  // Angled upward
+
+
+    GLfloat l2_pos[] = {-20.5f, 0.0f, 21.5f, 5.0f};
+    glLightfv(GL_LIGHT2, GL_AMBIENT, mbs_ambient);
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, mbs_color);
+    glLightfv(GL_LIGHT2, GL_POSITION, l2_pos);
+    glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, spot_dir);
+    glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 45.0f);
+    glLightf(GL_LIGHT2, GL_SPOT_EXPONENT, 2.0f);
+    glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.02f);
+    glEnable(GL_LIGHT2);
+
+  
+    
+}
 // Update lighting setup
 void setupLights() {
     // Track spotlights
    for(int i = 0; i < sizeof(lightTowers)/sizeof(LightTower); i++) {
-        GLenum light = GL_LIGHT0 + i;
+        GLenum light = GL_LIGHT3 + i;
         glEnable(light);
         
         GLfloat pos[] = {lightTowers[i].x, lightTowers[i].height, lightTowers[i].z, 1.0f};
@@ -1190,7 +1238,56 @@ void setupLights() {
         glLightfv(light, GL_AMBIENT, ambient);
         glLightf(light, GL_QUADRATIC_ATTENUATION, 0.03f); // Less falloff
     }
+
+    GLenum light3 = GL_LIGHT0;
+    GLfloat pink_color[] = {1.0f, 0.41f, 0.71f, 1.0f};  
+    GLfloat pink_ambient[] = {0.3f, 0.1f, 0.2f, 1.0f};  
+    GLfloat pos3[] = {13.0f, 20.0f, 50.0f, 1.0f};
+    GLfloat spot_dir[] = {0.0f, 0.7f, -0.3f}; 
+
+    glEnable(light3);
+    glLightfv(light3, GL_POSITION, pos3);
+    glLightfv(light3, GL_DIFFUSE, pink_color);
+    glLightfv(light3, GL_AMBIENT, pink_ambient);
+    glLightf(light3, GL_SPOT_CUTOFF, 25.0f);         // Narrower spotlight angle
+    glLightf(light3, GL_SPOT_EXPONENT, 5.0f);        // Sharper falloff
+    glLightf(light3, GL_CONSTANT_ATTENUATION, 0.5f); // Base attenuation
+    // glLightf(light3, GL_LINEAR_ATTENUATION, 0.1f);   // Distance-based falloff
+    // glLightf(light3, GL_QUADRATIC_ATTENUATION, 0.05f); // Distance-squared falloff
+
+
+
+    GLenum light4 = GL_LIGHT1;
+    GLfloat blue_color[] = {0.0f, 0.5f, 1.0f, 1.0f};      // Bright blue
+    GLfloat blue_ambient[] = {0.0f, 0.1f, 0.3f, 1.0f};    // Dark blue ambient
+    GLfloat pos4[] = {-13.0f, 20.0f, 60.0f, 1.0f};
+    // GLfloat spot_dir[] = {0.0f, 0.7f, -0.3f}; 
+
+    glEnable(light4);
+    glLightfv(light4, GL_POSITION, pos4);
+    glLightfv(light4, GL_DIFFUSE, blue_color);
+    glLightfv(light4, GL_AMBIENT, blue_ambient);
+    glLightf(light4, GL_SPOT_CUTOFF,25.0f);         // Narrower spotlight angle
+    glLightf(light4, GL_SPOT_EXPONENT, 5.0f);        // Sharper falloff
+    glLightf(light4, GL_CONSTANT_ATTENUATION, 0.5f); 
+
+
+    GLenum light5 = GL_LIGHT2;
+    GLfloat pos5[] = {-13.0f, 20.0f, 60.0f, 1.0f};
+    GLfloat green_color[] = {0.0f, 1.0f, 0.0f, 1.0f};      // Bright green
+    GLfloat green_ambient[] = {0.0f, 0.3f, 0.0f, 1.0f};  
+    // glEnable(light4);
+    glLightfv(light5, GL_POSITION, pos4);
+  // Dark green ambient
+
+    glLightfv(light5, GL_DIFFUSE, green_color);
+    glLightfv(light5, GL_AMBIENT, green_ambient);
+    glLightf(light5, GL_SPOT_CUTOFF,25.0f);         // Narrower spotlight angle
+    glLightf(light5, GL_SPOT_EXPONENT, 5.0f);        // Sharper falloff
+    glLightf(light5, GL_CONSTANT_ATTENUATION, 0.5f); 
+
 }
+
 
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -1252,17 +1349,86 @@ void keyboardSpecial(int key, int x, int y) {
 }
 
 
-void keyboard(unsigned char key, int x, int y) {
-    if (key == 's') sceTZ += 1;
-    if (key == 'w') sceTZ -= 1;
+void keyboard(unsigned char key, int x, int y)
+{
 
-    if (key == 'Z')
+    switch (key)
+    {
+    case 27:     // 27 is the ASCII code for the Esc key
+        exit(0); // Exit the program
+        break;
+    case 'l':
+        objRY += 1;
+        break;
+    case 'r':
+        objRY -= 1;
+        break;
+    case 'Z':
+        sceTZ += 1;
+        break;
+    case 'z':
+        sceTZ -= 1;
+        break;
+    case 'a':
         sceTX += 1;
-
-    if (key == 'z')
+        objTX -= 1;
+        break;
+    case 'd':
         sceTX -= 1;
-
-
+        objTX += 1;
+        break;
+    case 'w':
+        sceTZ += 0.5;
+        objTZ -= 0.5;
+        break;
+    case 's':
+        sceTZ -= 1;
+        objTZ += 1;
+        break;
+    case 'q':
+        sceTY += 0.5;
+        objTY -= 0.5;
+        break;
+    case 'e':
+        sceTY -= 0.5;
+        objTY += 0.5;
+        break;
+    case '.':
+        lookX = 0;
+        lookY = 0;
+        lookZ = 0;
+        camX = camXInit;
+        camY = camYInit;
+        camZ = camZInit;
+        sceRX = sceRXInit;
+        sceRY = sceRYInit;
+        sceRZ = sceRZInit;
+        sceTX = sceTXInit;
+        sceTY = sceTYInit;
+        sceTZ = sceTZInit;
+        objRX = 0;
+        objRY = 0;
+        objRZ = 0;
+        objTX = 0;
+        objTY = 0;
+        objTZ = 0;
+        break;
+    case '1':
+        glEnable(GL_LIGHT0);
+        break;
+    case '3':
+        glDisable(GL_LIGHT0);
+        break;
+    case '!':
+        glDisable(GL_LIGHT0); // Light at -x
+        break;
+    case '@':
+        glDisable(GL_LIGHT1); // Light at +x
+        break;
+    case '2':
+        glEnable(GL_LIGHT1);
+        break;
+    }
     glutPostRedisplay();
 }
 
