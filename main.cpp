@@ -3,13 +3,14 @@
 #include <stdio.h>
 #include <SOIL/SOIL.h>
 
+#define M_PI 3.14159265358979323846
+#define MAX_LIGHTS 8;
+
+
 //GLfloat camY = 2.0;
 GLfloat sceRY = 0.0;
 GLfloat sceTX = 0.0;
 GLfloat sceTZ = 0.0;
-
-#define M_PI 3.14159265358979323846
-#define MAX_LIGHTS 9;
 
 
 
@@ -20,6 +21,8 @@ GLfloat moveSpeed = 0.5f;
 GLfloat rotateSpeed = 5.0f;
 GLfloat globalAmbient[] = {0.2f, 0.2f, 0.3f, 1.0f};  // Night sky ambient
 
+GLuint textureID;
+int width, height;
 // Structure for light towers
 struct LightTower {
     float x, y, z;  // Position
@@ -92,8 +95,7 @@ void drawAxes() {
     glEnd();
 }
 
-GLuint textureID;
-int width, height;
+
 
 // Update the texture loading and initialization
 GLuint loadTexture(const char* filename) {
@@ -175,6 +177,52 @@ void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat wi
     glDisable(GL_TEXTURE_2D);
 }
 
+void drawCircle(){
+  
+  glPushMatrix();
+  glTranslatef(0,0.01,0);
+  glRotatef(90,1,0,0);
+  GLUquadric *quad = gluNewQuadric();
+  gluDisk(quad,0,0.8,20,20);
+  glPopMatrix();
+}
+
+bool isCorner(GLfloat prevX, GLfloat prevZ, GLfloat currX, GLfloat currZ, GLfloat nextX, GLfloat nextZ) {
+    // Calculate vectors
+    GLfloat v1x = currX - prevX;
+    GLfloat v1z = currZ - prevZ;
+    GLfloat v2x = nextX - currX;
+    GLfloat v2z = nextZ - currZ;
+    
+    // Calculate dot product
+    GLfloat dot = v1x * v2x + v1z * v2z;
+    GLfloat mag1 = sqrt(v1x * v1x + v1z * v1z);
+    GLfloat mag2 = sqrt(v2x * v2x + v2z * v2z);
+    
+    // Calculate angle between vectors
+    GLfloat angle = acos(dot / (mag1 * mag2));
+    
+    // If angle is less than 150 degrees, consider it a corner
+    return angle < (150.0f * M_PI / 180.0f);
+}
+
+// Add this function to draw corner marker
+void drawCorner(GLfloat x, GLfloat y, GLfloat z) {
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,textureID);
+    glTranslatef(x, y + 0.02f, z);  // Slightly above track
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    
+    // Draw red circle for corner
+
+    GLUquadric* quad = gluNewQuadric();
+    gluDisk(quad, 0.0f, 0.8f, 20, 1);
+    gluDeleteQuadric(quad);
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+}
+
 void drawTrack() {
     // Track vertices for the centerline of the track
     GLfloat trackVertices[][3] = {
@@ -231,6 +279,15 @@ void drawTrack() {
         drawTrackSegment(trackVertices[i][0], trackVertices[i][2],
             trackVertices[i + 1][0], trackVertices[i + 1][2],
             trackWidth);
+    }
+
+     for (int i = 1; i < sizeof(trackVertices)/sizeof(trackVertices[0]) - 1; i++) {
+        // Check if current point is a corner
+        if (isCorner(trackVertices[i-1][0], trackVertices[i-1][2],
+                     trackVertices[i][0], trackVertices[i][2],
+                     trackVertices[i+1][0], trackVertices[i+1][2])) {
+            drawCorner(trackVertices[i][0], trackVertices[i][1], trackVertices[i][2]);
+        }
     }
 
     glEnd();
@@ -1075,7 +1132,8 @@ void display(void) {
 
     drawSingaporeFlyer();
     drawMarinaBaySands();
-    drawArtScienceMuseum();
+    // drawArtScienceMuseum();
+
 
     glPopMatrix();
     glutSwapBuffers();
@@ -1127,9 +1185,7 @@ void init(void) {
     
     // Load textures
     const char* texturePaths[] = {
-        "textures/road.jpg",
         "../textures/road.jpg",
-        "/mnt/sda2/Academics/2 SEM/Graphic/programming/MarinaBayF1/textures/road.jpg"
     };
     
     bool textureLoaded = false;
