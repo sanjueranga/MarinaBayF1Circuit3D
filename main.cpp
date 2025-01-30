@@ -182,15 +182,6 @@ void drawTrackSegment(GLfloat x1, GLfloat z1, GLfloat x2, GLfloat z2, GLfloat wi
     glDisable(GL_TEXTURE_2D);
 }
 
-void drawCircle(){
-  
-  glPushMatrix();
-  glTranslatef(0,0.01,0);
-  glRotatef(90,1,0,0);
-  GLUquadric *quad = gluNewQuadric();
-  gluDisk(quad,0,0.8,20,20);
-  glPopMatrix();
-}
 
 bool isCorner(GLfloat prevX, GLfloat prevZ, GLfloat currX, GLfloat currZ, GLfloat nextX, GLfloat nextZ) {
     // Calculate vectors
@@ -466,7 +457,7 @@ void fillBayOutlineWithLand() {
 
         for (int i = 0; i < count; i += 2) {
             // Fill land between previous X and current intersection
-            glColor3f(0.1, 0.1, 0.3);
+            glColor3f(0.1f, 0.1f, 0.1f); 
             glVertex3f(prevX, 0.0f, z);
             glVertex3f(prevX, 0.0f, z + stepZ);
             glVertex3f(intersections[i], 0.0f, z + stepZ);
@@ -474,7 +465,7 @@ void fillBayOutlineWithLand() {
 
             // Fill water between pairs of intersections
             if (i + 1 < count) {
-                glColor4f(0.05f, 0.05f, 0.15f, 0.8f);
+                glColor4f(0.0f, 0.2f, 0.4f, 0.8f); 
                 glVertex3f(intersections[i], 0.0f, z);
                 glVertex3f(intersections[i], 0.0f, z + stepZ);
                 glVertex3f(intersections[i + 1], 0.0f, z + stepZ);
@@ -485,7 +476,7 @@ void fillBayOutlineWithLand() {
         }
 
         // Fill remaining land to the right of the last intersection
-        glColor3f(0.1, 0.1, 0.3);
+        glColor3f(0.2f, 0.2f, 0.4f);
         glVertex3f(prevX, 0.0f, z);
         glVertex3f(prevX, 0.0f, z + stepZ);
         glVertex3f(maxX, 0.0f, z + stepZ);
