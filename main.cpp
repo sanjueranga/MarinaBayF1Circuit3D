@@ -205,22 +205,63 @@ bool isCorner(GLfloat prevX, GLfloat prevZ, GLfloat currX, GLfloat currZ, GLfloa
 // Add this function to draw corner marker
 void drawCorner(GLfloat x, GLfloat y, GLfloat z) {
     glPushMatrix();
+    
+    // Move to corner position
+    glTranslatef(x, y + 0.02f, z);
+    
+    // Rotate to align with track
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+
+    // Enable textures
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTranslatef(x, y + 0.02f, z);  // Slightly above track
-    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+
+    // Enable blending for smoother transitions
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Adjust material properties to match the track
+    GLfloat ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};  // Less ambient light reflection
+    GLfloat diffuse[] = {0.6f, 0.6f, 0.6f, 1.0f};  // Balanced lighting
+    GLfloat specular[] = {0.1f, 0.1f, 0.1f, 1.0f}; // Very low specular reflection
+    GLfloat shininess = 5.0f;                      // Lower shininess to avoid harsh highlights
     
-    // Create quadric object and set its properties
-    GLUquadric* quad = gluNewQuadric();
-    gluQuadricTexture(quad, GL_TRUE);  // Enable texture coordinates
-    gluQuadricNormals(quad, GLU_SMOOTH);
+    glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+
+    // Define corner shape
+    const int segments = 32;
+    const float radius = 0.8f;
     
-    // Draw textured disk
-    glColor3f(1.0f, 1.0f, 1.0f);  // Set to white to show texture properly
-    gluDisk(quad, 0.0f, 0.8f, 20, 1);
+    glBegin(GL_TRIANGLE_FAN);
+
+    // Center vertex (with normal pointing upwards)
+    glNormal3f(0.0f, 1.0f, 0.0f); // Normal to reduce light sensitivity
+    glTexCoord2f(0.5f, 0.5f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+
+    // Outer ring vertices (circle)
+    for(int i = 0; i <= segments; i++) {
+        float angle = 2.0f * M_PI * i / segments;
+        float px = radius * cosf(angle);
+        float py = radius * sinf(angle);
+        
+        float tx = 0.5f + 0.5f * cosf(angle);
+        float ty = 0.5f + 0.5f * sinf(angle);
+
+        glNormal3f(0.0f, 1.0f, 0.0f);  // Ensure uniform lighting
+        glTexCoord2f(tx, ty);
+        glVertex3f(px, py, 0.0f);
+    }
+
+    glEnd();
     
-    gluDeleteQuadric(quad);
+    // Disable blending and texture
+    glDisable(GL_BLEND);
     glDisable(GL_TEXTURE_2D);
+
     glPopMatrix();
 }
 
