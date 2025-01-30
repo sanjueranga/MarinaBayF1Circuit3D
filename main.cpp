@@ -210,19 +210,23 @@ bool isCorner(GLfloat prevX, GLfloat prevZ, GLfloat currX, GLfloat currZ, GLfloa
 void drawCorner(GLfloat x, GLfloat y, GLfloat z) {
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D,textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
     glTranslatef(x, y + 0.02f, z);  // Slightly above track
     glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
     
-    // Draw red circle for corner
-
+    // Create quadric object and set its properties
     GLUquadric* quad = gluNewQuadric();
+    gluQuadricTexture(quad, GL_TRUE);  // Enable texture coordinates
+    gluQuadricNormals(quad, GLU_SMOOTH);
+    
+    // Draw textured disk
+    // glColor3f(1.0f, 1.0f, 1.0f);  // Set to white to show texture properly
     gluDisk(quad, 0.0f, 0.8f, 20, 1);
+    
     gluDeleteQuadric(quad);
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
-
 void drawTrack() {
     // Track vertices for the centerline of the track
     GLfloat trackVertices[][3] = {
@@ -282,6 +286,15 @@ void drawTrack() {
         drawTrackSegment(trackVertices[i][0], trackVertices[i][2],
             trackVertices[i + 1][0], trackVertices[i + 1][2],
             trackWidth);
+    }
+
+    for (int i = 1; i < sizeof(trackVertices)/sizeof(trackVertices[0]) ; i++) {
+        // Check if current point is a corner
+        if (isCorner(trackVertices[i-1][0], trackVertices[i-1][2],
+                     trackVertices[i][0], trackVertices[i][2],
+                     trackVertices[i+1][0], trackVertices[i+1][2])) {
+            drawCorner(trackVertices[i][0], trackVertices[i][1], trackVertices[i][2]);
+        }
     }
 
     glEnd();
@@ -1026,7 +1039,7 @@ void drawTopPlatform() {
 void drawMarinaBaySands() {
     glPushMatrix();
     // Adjust initial position for smaller scale
-    glTranslatef(-14.0f, 0.0f, 28.0f);  // Reduced from (-10.0f, 0.0f, 28.0f)
+    glTranslatef(-13.0f, 0.0f, 36.0f);  // Reduced from (-10.0f, 0.0f, 28.0f)
     
     // Scaled down parameters
     float towerWidth = 0.75f;   // Reduced from 1.5f
@@ -1064,53 +1077,78 @@ void drawMarinaBaySands() {
     glPopMatrix();
 }
 
+
 void drawCurvedSlice(float radius, float thickness, float maxHeight, float minHeight, float angleRange) {
-    const int segments = 50;
-    glColor3f(1.0f, 0.7f, 0.0f);
-    glBegin(GL_QUAD_STRIP);
-    for (int i = 0; i <= segments; i++) {
-        float angle = (angleRange * i) / segments;
 
-        // Height varies with angle - tallest in the middle
-        float height = minHeight + (maxHeight - minHeight) * 
-                           sin(angle / angleRange * M_PI);
+	glPushMatrix();
+	const int segments = 50;
+	//glColor3f(1.0f, 0.7f, 0.0f);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glBegin(GL_QUAD_STRIP);
+	for (int i = 0; i <= segments; i++) {
+		float angle = (angleRange * i) / segments;
 
-        // Coordinates for the lower-right quadrant (x > 0, y < 0)
-        float x1 = radius * cos(angle);
-        float y1 = -radius * sin(angle);  // Negate y for the lower-right quadrant
-        float x2 = (radius - thickness) * cos(angle);
-        float y2 = -(radius - thickness) * sin(angle);  // Negate y for the lower-right quadrant
+		// Height varies with angle - tallest in the middle
+		float height = minHeight + (maxHeight - minHeight) *
+			sin(angle / angleRange *M_PI);
 
-        glVertex3f(x1, y1, 0.0f);  // Outer bottom vertex
-        glVertex3f(x2, y2, 0.0f);  // Inner bottom vertex
-        glVertex3f(x1, y1, height);  // Outer top vertex
-        glVertex3f(x2, y2, height);  // Inner top vertex
-    }
-    glEnd();
+		// Coordinates for the lower-right quadrant (x > 0, y < 0)
+		float x1 = radius * cos(angle);
+		float y1 = -radius * sin(angle);  // Negate y for the lower-right quadrant
+		float x2 = (radius - thickness) * cos(angle);
+		float y2 = -(radius - thickness) * sin(angle);  // Negate y for the lower-right quadrant
+
+		glVertex3f(x1, y1, 0.0f);  // Outer bottom vertex
+		glVertex3f(x2, y2, 0.0f);  // Inner bottom vertex
+		glVertex3f(x1, y1, height);  // Outer top vertex
+		glVertex3f(x2, y2, height);  // Inner top vertex
+	}
+	glEnd();
+	glPopMatrix();
 }
+
+
+void drawPetal(float angle) {
+
+	const float radius = 2.0f;
+	const float thickness = 0.5f;
+	const float maxHeight = 1.0f;
+	const float minHeight = 0.5f;
+
+	//float angle = PI / 6;
+	float rightAngle = -90;
+
+	glPushMatrix();
+	glRotatef(rightAngle - angle, 0, 0, 1);
+	drawCurvedSlice(radius, thickness, maxHeight, minHeight, (M_PI/4) + angle);
+	glPopMatrix();
+
+}
+
 
 void drawArtScienceMuseum() {
-    const int numPetals = 4; // Number of petals
-    const float totalAngleRange = M_PI; // 180 degrees
-    const float radius = 2.0f;
-    const float thickness = 0.5f;
-    const float maxHeight = 1.0f;
-    const float minHeight = 0.5f;
 
-    glTranslatef(0.0f, 2.0f, 0.0f); 
+	float numPetals = 8;
+	float deltaAngle = 45;
+	float angle = 0;
 
-    float angleIncrement = totalAngleRange / numPetals; // Angle increment per petal (45° for each petal)
-    float petalAngles[4] = {M_PI / 2,  M_PI / 2, 3 * M_PI / 5, 4 * M_PI / 5}; // Vary the petal angles (90, 120, 150 degrees)
+	glPushMatrix();
 
-    for (int i = 0; i < numPetals; i++) {
-        glPushMatrix();
-        glRotatef(i * angleIncrement * 180.0f / M_PI, 0.0f, 1.0f, 0.0f); // Rotation for each petal based on the increment
-        drawCurvedSlice(radius, thickness, maxHeight, minHeight, petalAngles[i]);
+	for (int i = 0; i < numPetals; i++) {
+		glRotatef(deltaAngle, 0, 1, 0);
 
-        glPopMatrix();
-    }
+		if (i > 3) {
+			angle += M_PI/10;
+			drawPetal(angle);
+			continue;
+		}
+		drawPetal(0);
+
+	}
+
+	glPopMatrix();
+
 }
-
 
 // Add this function to draw light towers
 void drawLightTower(float x, float y, float z, float height) {
@@ -1184,7 +1222,11 @@ void display(void) {
 
     drawSingaporeFlyer();
     drawMarinaBaySands();
-    // drawArtScienceMuseum();
+
+    glPushMatrix();
+     glTranslatef(-14.0f, 2.0f, 25.0f);
+    drawArtScienceMuseum();
+    glPopMatrix();
 
 
     glPopMatrix();
