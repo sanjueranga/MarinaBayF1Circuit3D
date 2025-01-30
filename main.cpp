@@ -58,10 +58,10 @@ struct LightTower {
 LightTower lightTowers[] = {
     {-20.5f, 0.0f, -21.5f, 5.0f},
     {-49.5f, 0.0f, -20.5f, 5.0f},
+    {5.0f, 0.0f, 10.0f, 5.0f},
     {31.0f, 0.0f, 25.5f, 5.0f},
     {30.5f, 0.0f, -10.5f, 5.0f},
     {-5.0f, 0.0f, -10.0f, 5.0f},
-
 
 };
 
@@ -75,27 +75,6 @@ void update() {
     }
     glutPostRedisplay();
 }
-// Lighting setup
-void light0() {
-    GLfloat amb[] = { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat diff[] = { 0.8, 0.8, 0.8, 1.0 };
-    GLfloat spec[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat pos[] = { -0.5, 1.0, -0.5, 1.0 };
-
-    glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-}
-
-void setLighting() {
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    light0();
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-}
-
 
 void drawGrid() {
     GLfloat step = 1.0f;
@@ -246,13 +225,14 @@ void drawCorner(GLfloat x, GLfloat y, GLfloat z) {
     gluQuadricNormals(quad, GLU_SMOOTH);
     
     // Draw textured disk
-    // glColor3f(1.0f, 1.0f, 1.0f);  // Set to white to show texture properly
+    glColor3f(1.0f, 1.0f, 1.0f);  // Set to white to show texture properly
     gluDisk(quad, 0.0f, 0.8f, 20, 1);
     
     gluDeleteQuadric(quad);
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
 }
+
 void drawTrack() {
     // Track vertices for the centerline of the track
     GLfloat trackVertices[][3] = {
@@ -1197,27 +1177,6 @@ void drawLightTower(float x, float y, float z, float height) {
 }
 
 
-
-void setupMarinaBaySandsLighting() {
-    // Front facade spotlights
-    GLfloat mbs_color[] = {0.9f, 0.0f, 0.2f, 1.0f};  // Warm white
-    GLfloat mbs_ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    GLfloat spot_dir[] = {0.0f, 0.7f, -0.3f};  // Angled upward
-
-
-    GLfloat l2_pos[] = {-20.5f, 0.0f, 21.5f, 5.0f};
-    glLightfv(GL_LIGHT2, GL_AMBIENT, mbs_ambient);
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, mbs_color);
-    glLightfv(GL_LIGHT2, GL_POSITION, l2_pos);
-    glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, spot_dir);
-    glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, 45.0f);
-    glLightf(GL_LIGHT2, GL_SPOT_EXPONENT, 2.0f);
-    glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.02f);
-    glEnable(GL_LIGHT2);
-
-  
-    
-}
 // Update lighting setup
 void setupLights() {
     // Track spotlights
@@ -1232,7 +1191,7 @@ void setupLights() {
         
         glLightfv(light, GL_POSITION, pos);
         glLightfv(light, GL_SPOT_DIRECTION, dir);
-        glLightf(light, GL_SPOT_CUTOFF, 200.0f);        // Wider coverage
+        glLightf(light, GL_SPOT_CUTOFF, 100.0f);        // Wider coverage
         glLightf(light, GL_SPOT_EXPONENT, 1.5f);       // Softer edge
         glLightfv(light, GL_DIFFUSE, white);
         glLightfv(light, GL_AMBIENT, ambient);
@@ -1252,10 +1211,6 @@ void setupLights() {
     glLightf(light3, GL_SPOT_CUTOFF, 25.0f);         // Narrower spotlight angle
     glLightf(light3, GL_SPOT_EXPONENT, 5.0f);        // Sharper falloff
     glLightf(light3, GL_CONSTANT_ATTENUATION, 0.5f); // Base attenuation
-    // glLightf(light3, GL_LINEAR_ATTENUATION, 0.1f);   // Distance-based falloff
-    // glLightf(light3, GL_QUADRATIC_ATTENUATION, 0.05f); // Distance-squared falloff
-
-
 
     GLenum light4 = GL_LIGHT1;
     GLfloat blue_color[] = {0.0f, 0.5f, 1.0f, 1.0f};      // Bright blue
@@ -1270,21 +1225,6 @@ void setupLights() {
     glLightf(light4, GL_SPOT_CUTOFF,25.0f);         // Narrower spotlight angle
     glLightf(light4, GL_SPOT_EXPONENT, 5.0f);        // Sharper falloff
     glLightf(light4, GL_CONSTANT_ATTENUATION, 0.5f); 
-
-
-    GLenum light5 = GL_LIGHT2;
-    GLfloat pos5[] = {-13.0f, 20.0f, 60.0f, 1.0f};
-    GLfloat green_color[] = {0.0f, 1.0f, 0.0f, 1.0f};      // Bright green
-    GLfloat green_ambient[] = {0.0f, 0.3f, 0.0f, 1.0f};  
-    // glEnable(light4);
-    glLightfv(light5, GL_POSITION, pos4);
-  // Dark green ambient
-
-    glLightfv(light5, GL_DIFFUSE, green_color);
-    glLightfv(light5, GL_AMBIENT, green_ambient);
-    glLightf(light5, GL_SPOT_CUTOFF,25.0f);         // Narrower spotlight angle
-    glLightf(light5, GL_SPOT_EXPONENT, 5.0f);        // Sharper falloff
-    glLightf(light5, GL_CONSTANT_ATTENUATION, 0.5f); 
 
 }
 
@@ -1301,8 +1241,8 @@ void display(void) {
 
     setupLights();
     
-    drawGrid();
-    drawAxes();
+    // drawGrid();
+    // drawAxes();
 
     // Draw light towers
     for(int i = 0; i < sizeof(lightTowers)/sizeof(LightTower); i++) {
