@@ -235,9 +235,9 @@ void drawTrack() {
         {-48.5f, 0.0f, -17.0f},
         {-47.4f, 0.0f, -15.0f},
         {-44.8f, 0.0f, -12.0f},
-        {-46.8f, 0.0f,-8.0f},
-        {-47.0f, 0.0f,-7.0f},
-        {-44.5f, 0.0f,0.0f},
+        {-46.8f, 0.0f, -8.0f},
+        {-47.0f, 0.0f, -7.0f},
+        {-44.5f, 0.0f, 0.0f},
         {-44.0f, 0.0f, 4.8f},
         {-43.5f, 0.0f, 5.0f},
         {-31.0f, 0.0f, -10.0f},
@@ -250,29 +250,32 @@ void drawTrack() {
         {11.0f, 0.0f, 17.6f},
         {25.0f, 0.0f, 27.6f},
         {31.0f, 0.0f, 24.5f},
-        {47.2f, 0.0f,-7.8f},
-        {44.0f, 0.0f,-10.0f},
-        {42.5f, 0.0f,-12.0f},
-        {42.1f, 0.0f,-15.0f},
-        {40.1f, 0.0f,-15.7f},
-        {39.1f, 0.0f,-15.0f},
-        {36.1f, 0.0f,-12.0f},
-        {34.5f, 0.0f,-10.0f},
-        {33.0f, 0.0f,-6.0f},
-        {32.5f, 0.0f,0.0f},
-        {29.5f, 0.0f,6.5f},
-        {26.5f, 0.0f,7.0f},
-        {4.0f, 0.0f,-7.5f},
-        {3.0f, 0.0f,-8.5f},
-        {1.3f, 0.0f,-10.0f},
-        {-9.5f, 0.0f,-28.5f},
-        {-20.5f, 0.0f,-22.5f},
+        {47.2f, 0.0f, -7.8f},
+        {44.0f, 0.0f, -10.0f},
+        {42.5f, 0.0f, -12.0f},
+        {42.1f, 0.0f, -15.0f},
+        {40.1f, 0.0f, -15.7f},
+        {39.1f, 0.0f, -15.0f},
+        {36.1f, 0.0f, -12.0f},
+        {34.5f, 0.0f, -10.0f},
+        {33.0f, 0.0f, -6.0f},
+        {32.5f, 0.0f, 0.0f},
+        {29.5f, 0.0f, 6.5f},
+        {26.5f, 0.0f, 7.0f},
+        {4.0f, 0.0f, -7.5f},
+        {3.0f, 0.0f, -8.5f},
+        {1.3f, 0.0f, -10.0f},
+        {-9.5f, 0.0f, -28.5f},
+        {-20.5f, 0.0f, -22.5f},
     };
 
     GLfloat trackWidth = 1.5f;  // Set track width here
+    GLfloat boundaryWidth = 0.2f;  // Width of the boundary strips
+    GLfloat boundaryHeight = 0.1f;  // Height of the boundary strips above the land
+    GLfloat stripWidth = 0.09f;  // Width of each small strip
 
+    // Draw the main track segments
     glColor3f(1.0, 1.0, 1.0);   // Track color
-
     glBegin(GL_QUADS);           // Use quads for each segment
 
     for (int i = 0; i < sizeof(trackVertices) / sizeof(trackVertices[0]) - 1; i++) {
@@ -281,18 +284,67 @@ void drawTrack() {
             trackWidth);
     }
 
-     for (int i = 1; i < sizeof(trackVertices)/sizeof(trackVertices[0]) - 1; i++) {
-        // Check if current point is a corner
-        if (isCorner(trackVertices[i-1][0], trackVertices[i-1][2],
-                     trackVertices[i][0], trackVertices[i][2],
-                     trackVertices[i+1][0], trackVertices[i+1][2])) {
-            drawCorner(trackVertices[i][0], trackVertices[i][1], trackVertices[i][2]);
+    glEnd();
+
+    // Draw boundary lines as thin strips with a checkerboard pattern
+    for (int i = 0; i < sizeof(trackVertices) / sizeof(trackVertices[0]) - 1; i++) {
+        // Calculate the direction vector
+        GLfloat dx = trackVertices[i + 1][0] - trackVertices[i][0];
+        GLfloat dz = trackVertices[i + 1][2] - trackVertices[i][2];
+
+        // Normalize the direction vector
+        GLfloat length = sqrt(dx * dx + dz * dz);
+        dx /= length;
+        dz /= length;
+
+        // Calculate the perpendicular vector
+        GLfloat px = -dz;
+        GLfloat pz = dx;
+
+        // Scale the perpendicular vector by half the track width
+        px *= trackWidth / 2.0f;
+        pz *= trackWidth / 2.0f;
+
+        // Calculate the vertices of the boundary strips
+        GLfloat leftX1 = trackVertices[i][0] + px;
+        GLfloat leftZ1 = trackVertices[i][2] + pz;
+        GLfloat rightX1 = trackVertices[i][0] - px;
+        GLfloat rightZ1 = trackVertices[i][2] - pz;
+
+        GLfloat leftX2 = trackVertices[i + 1][0] + px;
+        GLfloat leftZ2 = trackVertices[i + 1][2] + pz;
+        GLfloat rightX2 = trackVertices[i + 1][0] - px;
+        GLfloat rightZ2 = trackVertices[i + 1][2] - pz;
+
+        // Draw the boundary strips with a checkerboard pattern
+        int numStrips = (int)(boundaryWidth / stripWidth);
+        for (int j = 0; j < numStrips; j++) {
+            GLfloat offset = (j - numStrips / 2) * stripWidth;
+
+            if (j % 2 == 0) {
+                glColor3f(1.0, 0.0, 0.0);  // Red
+            } else {
+                glColor3f(1.0, 1.0, 1.0);  // White
+            }
+
+            // Left boundary strip
+            glBegin(GL_QUADS);
+            glVertex3f(leftX1 + offset, boundaryHeight, leftZ1);
+            glVertex3f(leftX1 + offset + stripWidth, boundaryHeight, leftZ1);
+            glVertex3f(leftX2 + offset + stripWidth, boundaryHeight, leftZ2);
+            glVertex3f(leftX2 + offset, boundaryHeight, leftZ2);
+            glEnd();
+
+            // Right boundary strip
+            glBegin(GL_QUADS);
+            glVertex3f(rightX1 - offset, boundaryHeight, rightZ1);
+            glVertex3f(rightX1 - offset - stripWidth, boundaryHeight, rightZ1);
+            glVertex3f(rightX2 - offset - stripWidth, boundaryHeight, rightZ2);
+            glVertex3f(rightX2 - offset, boundaryHeight, rightZ2);
+            glEnd();
         }
     }
-
-    glEnd();
 }
-
 
 GLfloat bayVertices[][3] = {
     {-37.5f, 0.0f, -10.0f},
