@@ -1315,8 +1315,8 @@ void reshape(GLsizei w, GLsizei h) {
 void keyboardSpecial(int key, int x, int y) {
     if (key == GLUT_KEY_UP) camY += 0.5;
     if (key == GLUT_KEY_DOWN) camY -= 0.5;
-    if (key == GLUT_KEY_LEFT) sceRY -= 2.0;
-    if (key == GLUT_KEY_RIGHT) sceRY += 2.0;
+    if (key == GLUT_KEY_RIGHT) sceRY -= 2.0;
+    if (key == GLUT_KEY_LEFT) sceRY += 2.0;
     glutPostRedisplay();
 }
 
@@ -1341,11 +1341,11 @@ void keyboard(unsigned char key, int x, int y)
     case 'z':
         sceTZ -= 1;
         break;
-    case 'a':
+    case 'd':
         sceTX += 1;
         objTX -= 1;
         break;
-    case 'd':
+    case 'a':
         sceTX -= 1;
         objTX += 1;
         break;
@@ -1439,7 +1439,7 @@ int main(int argc, char** argv) {
     glutIdleFunc(update);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("Marina Bay Circuit with Camera Controls");
+    glutCreateWindow("Marina Bay Circuit");
 
     init();
     glutDisplayFunc(display);
